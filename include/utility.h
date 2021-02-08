@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define PRECISION 0.0001 //Error accepted when dealing with doubles
 
@@ -76,10 +77,27 @@ int compare_arr(double *a, double *b, size_t n);
 int compare_mat(double **a, double **b, size_t cols, size_t rows);
 
 /**
- * Swap the values pointed by the two pointers
+ * Swaps the values pointed by the two pointers
  * 
  * @param a First pointer
  * @param b Second pointer
  */
 void swap(double *a, double *b);
+
+/**
+ * Reads the values in a file and produces the corrisponding complete matrix
+ * 
+ * @param fname Name of the file
+ * 
+ * @return Complete matrix written in the file
+ */
+double *read_matrix_from_file(const char *fname);
+
+/**
+ * Checks if a function call caused an error based on its return valus
+ * 
+ * @param ret Return value of the function
+ * @param mes Message to show if an error has occurred
+ */
+void check_ret(int ret, const char *mes);
 #endif

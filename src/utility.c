@@ -109,3 +109,32 @@ void swap(double *a, double *b)
     *a = *b;
     *b = temp;
 }
+
+double *read_matrix_from_file(const char *fname)
+{
+    double *U;
+    int cols, n_values, ret;
+
+    FILE *in_file = fopen(fname, "r");
+    if (!in_file)
+        check_ret(-1, "opening file");
+    fscanf(in_file, "%d", &cols);
+    n_values = cols * cols + cols;
+    U = (double *)malloc(sizeof(double) * n_values);
+    memset(U, 0, n_values);
+    for (size_t i = 0; i < n_values && ret != EOF; ++i)
+        ret = fscanf(in_file, "%lf", &U[i]);
+
+    ret = fclose(in_file);
+    check_ret(ret, "closing file");
+    return U;
+}
+
+void check_ret(int ret, const char *mes)
+{
+    if (ret == -1)
+    {
+        perror(mes);
+        //exit(1);
+    }
+}

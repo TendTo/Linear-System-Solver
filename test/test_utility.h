@@ -34,6 +34,16 @@ START_TEST(test_swap)
 }
 END_TEST
 
+START_TEST(test_read_matrix_from_file)
+{
+    double *U;
+    double expected[12] = {1.0, 3.0, -4.0, 1.0, 3.0, 1.0, 2.0, -7.0, 0.0, -2.0, 3.0, 1.0};
+    U = read_matrix_from_file("test/test_matrix.txt");
+    ck_assert(compare_arr(U, expected, 12));
+    free(U);
+}
+END_TEST
+
 Suite *utility_suite(void)
 {
     Suite *s;
@@ -45,7 +55,7 @@ Suite *utility_suite(void)
     tcase_add_test(tc_core, test_create_complete_matrix_lin);
     tcase_add_test(tc_core, test_create_complete_matrix_lin_b_null);
     tcase_add_test(tc_core, test_swap);
-
+    tcase_add_test(tc_core, test_read_matrix_from_file);
 
     suite_add_tcase(s, tc_core);
 
