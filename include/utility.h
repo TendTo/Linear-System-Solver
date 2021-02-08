@@ -100,4 +100,5 @@ double *read_matrix_from_file(const char *fname);
  * @param mes Message to show if an error has occurred
  */
 void check_ret(int ret, const char *mes);
+
 #endif

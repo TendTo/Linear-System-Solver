@@ -171,6 +171,17 @@ cl_program create_program(const char *const fname, cl_context ctx,
 	return prg;
 }
 
+cl_status create_cl_status(const char *const fname)
+{
+	cl_status status;
+	status.p = select_platform();
+	status.d = select_device(status.p);
+	status.ctx = create_context(status.p, status.d);
+	status.que = create_queue(status.ctx, status.d);
+	status.prog = create_program(fname, status.ctx, status.d);
+	return status;
+}
+
 cl_ulong runtime_ns(cl_event evt)
 {
 	cl_int err;

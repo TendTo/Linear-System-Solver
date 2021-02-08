@@ -3,11 +3,11 @@
 #include "test_utility.h"
 #include "test_gaussian_reduction.h"
 
-#define NSUITE 2
+#define NSUITE 3
 
 int main(void)
 {
-    Suite *(*suite_creators[NSUITE])(void) = {utility_suite, gaussian_reduction_suite};
+    Suite *(*suite_creators[NSUITE])(void) = {utility_suite, gaussian_reduction_suite, ocl_boiler_suite};
 
     int no_failed = 0;
     Suite *s;

@@ -45,6 +45,15 @@ int main(int argc, char *argv[])
 
 #define BUFSIZE 4096
 
+typedef struct
+{
+	cl_platform_id p;
+	cl_device_id d;
+	cl_context ctx;
+	cl_command_queue que;
+	cl_program prog;
+} cl_status;
+
 /** 
  * Check an OpenCL error status, printing a message and exiting
  * in case of failure
@@ -109,6 +118,20 @@ cl_command_queue create_queue(cl_context ctx, cl_device_id d);
  * @return A new OpenCL program generated from the given file
  */
 cl_program create_program(const char *const fname, cl_context ctx, cl_device_id d);
+
+/**
+ * Exectute all the neede function calls to produce a cl_status struct
+ * 
+ * @see select_platform()
+ * @see select_device()
+ * @see create_context()
+ * @see create_queue()
+ * @see create_program()
+ * @param fname Name of the file that contains the OpenCL program
+ * 
+ * @return A cl_status struct that contains all the info needed to run a cl program
+ */
+cl_status create_cl_status(const char* const fname);
 
 /**
  * Runtime of an event, in nanoseconds. Note that if NS is the

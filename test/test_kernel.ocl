@@ -1,0 +1,12 @@
+kernel void init_mat(int nrows, int ncols, global double * mat)
+{
+	const int r = get_global_id(1);
+	const int c = get_global_id(0);
+
+	if (r >= nrows || c >= ncols)
+		return;
+
+	const int l = r*ncols + c;
+
+	mat[l] = l;
+}

@@ -75,10 +75,10 @@ help:
 #  PRODUCTION TARGETS
 #==============================================================================
 
-# Building prodution files
+# Building prodution files (remove -D TEST)
 $(PRODUCTION_ENTRY_OBJECT) $(PRODUCTION_OBJECTS): $(PRODUCTION_ENTRY_FILE) $(PRODUCTION_FILES) $(HEADER_FILES)
 	@echo $(ECHO_FLAG) "Compiling production code..  "
-	$(SILENCE)$(CC) $(CFLAGS) $(LDLIBS) -c $^ \
+	$(SILENCE)$(CC) $(CFLAGS) $(LDLIBS) -D TEST -c $^ \
 	2> temp_error_file; if [ $$? -ne 0 ]; then touch _error_flag; fi; true
 	$(SILENCE)if [ -f _error_flag ]; then \
 	  rm -f _error_flag; \
