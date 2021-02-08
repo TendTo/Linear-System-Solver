@@ -27,9 +27,9 @@ cl_platform_id select_platform()
 
 	err = clGetPlatformIDs(0, NULL, &nplats);
 	ocl_check(err, "counting platforms");
-
+#ifndef TEST
 	printf("number of platforms: %u\n", nplats);
-
+#endif
 	plats = malloc(nplats * sizeof(*plats));
 
 	err = clGetPlatformIDs(nplats, plats, NULL);
@@ -48,9 +48,9 @@ cl_platform_id select_platform()
 	err = clGetPlatformInfo(choice, CL_PLATFORM_NAME, BUFSIZE,
 							buffer, NULL);
 	ocl_check(err, "getting platform name");
-
+#ifndef TEST
 	printf("selected platform %d: %s\n", nump, buffer);
-
+#endif
 	return choice;
 }
 
@@ -66,8 +66,9 @@ cl_device_id select_device(cl_platform_id p)
 
 	err = clGetDeviceIDs(p, CL_DEVICE_TYPE_ALL, 0, NULL, &ndevs);
 	ocl_check(err, "counting devices");
-
+#ifndef TEST
 	printf("number of devices: %u\n", ndevs);
+#endif
 
 	devs = malloc(ndevs * sizeof(*devs));
 
@@ -87,9 +88,9 @@ cl_device_id select_device(cl_platform_id p)
 	err = clGetDeviceInfo(choice, CL_DEVICE_NAME, BUFSIZE,
 						  buffer, NULL);
 	ocl_check(err, "device name");
-
+#ifndef TEST
 	printf("selected device %d: %s\n", numd, buffer);
-
+#endif
 	return choice;
 }
 
@@ -133,7 +134,9 @@ cl_program create_program(const char *const fname, cl_context ctx,
 
 	snprintf(src_buf, BUFSIZE, "// %s#include \"%s\"\n",
 			 ctime(&now), fname);
+#ifndef TEST
 	printf("compiling:\n%s", src_buf);
+#endif
 	prg = clCreateProgramWithSource(ctx, 1, &buf_ptr, NULL, &err);
 	ocl_check(err, "create program");
 
@@ -160,7 +163,9 @@ cl_program create_program(const char *const fname, cl_context ctx,
 	{
 		log_buf[logsize] = '\0';
 	}
+#ifndef TEST
 	printf("=== BUILD LOG ===\n%s\n=========\n", log_buf);
+#endif
 	ocl_check(err, "build program");
 
 	return prg;

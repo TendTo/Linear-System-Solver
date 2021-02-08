@@ -22,7 +22,7 @@ OBJ_DIR := build
 BIN_DIR := bin
 
 # Testing configuration
-TEST_CFLAGS  := -Wall -g -I$(INC_DIR)
+TEST_CFLAGS  := -Wall -g -I$(INC_DIR) -DTEST
 TEST_LDLIBS  := -lcheck -lm -lpthread -lrt -lsubunit -lOpenCL
 
 # Production source preparation
@@ -111,7 +111,24 @@ main: $(OBJ_DIR) $(BIN_DIR) $(PRODUCTION_ENTRY_OBJECT)
 # Main target for unit testing
 test: $(OBJ_DIR) $(BIN_DIR) $(PRODUCTION_ENTRY_OBJECT)
 	$(SILENCE)$(CC) $(TEST_ENTRY_FILE) $(PRODUCTION_OBJECTS) -o $(BIN_DIR)/$(TEST_SUITE_BINARY_NAME) $(TEST_CFLAGS) $(TEST_LDLIBS)
-	$(SILENCE)./$(BIN_DIR)/$(TEST_SUITE_BINARY_NAME)
+	@echo "Testing...  $(YELLOW)$(BOLD)Start$(RESET)"
+	$(SILENCE)./$(BIN_DIR)/$(TEST_SUITE_BINARY_NAME) \
+	2> temp_error_file; if [ $$? -ne 0 ]; then touch _error_flag; fi; true
+	$(SILENCE)if [ -f _error_flag ]; then \
+	  rm -f _error_flag; \
+		echo "Testing...  $(RED)$(BOLD)Error$(RESET)"; \
+		cat temp_error_file; \
+		rm -f temp_error_file; \
+		false; \
+	else \
+		if [ -s temp_error_file ]; then \
+			echo "Testing...  $(YELLOW)$(BOLD)Warning$(RESET)"; \
+			cat temp_error_file; \
+		else \
+			echo "Testing...  $(GREEN)$(BOLD)Success$(RESET)"; \
+		fi \
+	fi
+	$(SILENCE)rm -f temp_error_file
 
 
 #==============================================================================
