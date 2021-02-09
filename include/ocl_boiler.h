@@ -120,18 +120,25 @@ cl_command_queue create_queue(cl_context ctx, cl_device_id d);
 cl_program create_program(const char *const fname, cl_context ctx, cl_device_id d);
 
 /**
- * Exectute all the neede function calls to produce a cl_status struct
+ * Exectute all the needed function calls to produce a cl_status struct
  * 
  * @see select_platform()
  * @see select_device()
  * @see create_context()
  * @see create_queue()
  * @see create_program()
+ * @param status Pointer to a cl_status struct that will be filled with the exectution of the function
  * @param fname Name of the file that contains the OpenCL program
- * 
- * @return A cl_status struct that contains all the info needed to run a cl program
  */
-cl_status create_cl_status(const char* const fname);
+void clCreateStatus(cl_status *status, const char *const fname);
+
+/**
+ * Free all the resources used in the cl_struct
+ * 
+ * @see create_cl_status()
+ * @param status Pointer to a cl_status struct that will be filled with all the resources to free
+ */
+void clFreeStatus(cl_status *status);
 
 /**
  * Runtime of an event, in nanoseconds. Note that if NS is the

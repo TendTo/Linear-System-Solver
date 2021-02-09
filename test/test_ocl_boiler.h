@@ -32,9 +32,11 @@ END_TEST
 START_TEST(test_simple_cl_application)
 {
     double expected[] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0};
+    cl_status status;
     cl_int rows = 3, cols = 4;
     size_t memsize = sizeof(double) * rows * cols;
-    cl_status status = create_cl_status("test/test_kernel.ocl");
+
+    clCreateStatus(&status, "test/test_kernel.ocl");
     ck_assert(status.prog);
 
     cl_int err;
@@ -66,12 +68,15 @@ START_TEST(test_simple_cl_application)
     ck_assert_int_eq(err, CL_SUCCESS);
 
     double *h_mat = clEnqueueMapBuffer(status.que, d_mat, CL_TRUE,
-                                    CL_MAP_READ, 0, memsize,
-                                    1, &init_evt, &read_evt, &err);
+                                       CL_MAP_READ, 0, memsize,
+                                       1, &init_evt, &read_evt, &err);
     ocl_check(err, "enqueue read_mat");
     ck_assert_int_eq(err, CL_SUCCESS);
 
     ck_assert(compare_arr(h_mat, expected, rows * cols));
+
+    clFreeStatus(&status);
+    ck_assert(1);
 }
 END_TEST
 

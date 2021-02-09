@@ -171,15 +171,26 @@ cl_program create_program(const char *const fname, cl_context ctx,
 	return prg;
 }
 
-cl_status create_cl_status(const char *const fname)
+void clCreateStatus(cl_status *status, const char *const fname)
 {
-	cl_status status;
-	status.p = select_platform();
-	status.d = select_device(status.p);
-	status.ctx = create_context(status.p, status.d);
-	status.que = create_queue(status.ctx, status.d);
-	status.prog = create_program(fname, status.ctx, status.d);
-	return status;
+	status->p = select_platform();
+	status->d = select_device(status->p);
+	status->ctx = create_context(status->p, status->d);
+	status->que = create_queue(status->ctx, status->d);
+	status->prog = create_program(fname, status->ctx, status->d);
+}
+
+void clFreeStatus(cl_status *status)
+{
+	cl_int err;
+	err = clReleaseProgram(status->prog);
+	ocl_check(err, "release program");
+	err = clRetainCommandQueue(status->que);
+	ocl_check(err, "release queue");
+	err = clRetainContext(status->ctx);
+	ocl_check(err, "release context");
+	err = clReleaseDevice(status->d);
+	ocl_check(err, "release device");
 }
 
 cl_ulong runtime_ns(cl_event evt)
