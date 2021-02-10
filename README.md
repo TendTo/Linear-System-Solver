@@ -13,6 +13,7 @@ Small application that aims to solve systems of linear equations using the gener
 ## :wrench: Setting up a local istance
 
 #### Requirements
+- [POSIX](https://en.wikipedia.org/wiki/POSIX) compliant environment
 - [gcc](https://gcc.gnu.org/) or an equivalent c compiler
 - [An OpenCL sdk](https://www.khronos.org/opencl/)
 
@@ -41,7 +42,7 @@ Small application that aims to solve systems of linear equations using the gener
 ## :books: Documentation
 Check the gh-pages branch
 
-[Link to the documentation](https://tendto.github.io/system-solver/)
+[Table of contents](docs/Table-of-contents.md)
 
 ## Credits
 - [Giuseppe Bilotta](https://github.com/Oblomov) for the _ocl_boiler.h_ (and for teaching me all the OpenCL fundamentals and more)
