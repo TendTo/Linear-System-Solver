@@ -45,6 +45,10 @@ int main(int argc, char *argv[])
 
 #define BUFSIZE 4096
 
+/**
+ * @struct cl_status
+ * @brief This structure contains all the initialized info neede to run an OpenCL applicative
+ */
 typedef struct
 {
 	cl_platform_id p;

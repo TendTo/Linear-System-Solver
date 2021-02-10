@@ -15,6 +15,7 @@
 #include <string.h>
 #include <math.h>
 #include "utility.h"
+#include "ocl_boiler.h"
 
 /**
  * Applies the Gaussian reduction with no pivoting.
@@ -39,5 +40,18 @@ double *Gaussian_reduction_no_pivot(double *A, double *b, size_t n);
  * @return Vector of length N containing the solutions to the system
  */
 double *Gaussian_reduction_pivot(double *A, double *b, size_t n);
+
+/**
+ * Applies the Gaussian reduction with no pivoting.
+ * This translates in a faster implementation, but there is the risk of being unable to solve otherwise solvable systems
+ * 
+ * @param A Matrix of coefficients of the equations
+ * @param b Vector of know terms. If NULL, A will be assumed as a complete matrix of size (n X n + 1)
+ * @param n Number of unknowns
+ * @param status Pointer to a cl_status struct that represents the current status of the OpenCL runtime
+ * 
+ * @return Vector of length N containing the solutions to the system
+ */
+double *Gaussian_reduction_no_pivot_gpu_naive(double *A, double *b, size_t n, cl_status *status);
 
 #endif

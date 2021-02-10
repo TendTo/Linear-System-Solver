@@ -1,0 +1,68 @@
+/*
+Bruteforce print_mat_lin
+
+  if (col == 0) {
+    printf("[\n");
+    for (int i = 0; i < rows; ++i) {
+      printf("\t[");
+      for (int j = 0; j < cols - 1; j++)
+        printf(" %.2f,", U[i * cols + j]);
+      printf(" %.2f ", U[i * cols + cols - 1]);
+      printf("]\n");
+    }
+    printf("]\n");
+  }
+*/
+kernel void gaussian_reduction_no_pivot_naive(int cols, global double *U,
+                                              global double *x,
+                                              local double *lmem) {
+  const int col = get_global_id(0);
+
+  if (col >= cols)
+    return;
+
+  const int rows = cols - 1;
+  const int resultOffset = rows * cols;
+
+  // Copy everything in local memeory (feasible for larger matrices ?)
+  for (int i = 0; i < rows; ++i) {
+    lmem[i * cols + col] = U[i * cols + col];
+  }
+  barrier(CLK_LOCAL_MEM_FENCE);
+
+  // Execute all the reductions
+  for (int pivot = 0; pivot < rows - 1; ++pivot) {
+    for (int row = pivot + 1; row < rows; ++row) {
+      int rowOffset = row * cols;
+      int pivotOffset = pivot * cols;
+      double mult = -lmem[rowOffset + pivot] / lmem[pivotOffset + pivot];
+
+      if (col > pivot)
+        lmem[rowOffset + col] += lmem[pivotOffset + col] * mult;
+      else
+        lmem[rowOffset + col] = 0;
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+  }
+
+  // Exclude the result-column-wi
+  if (col == cols - 1)
+    return;
+
+  // Calculate the result vector
+  for (int row = rows - 1; row >= 0; --row) {
+    int rowOffset = row * cols;
+
+    if (col > row)
+      lmem[resultOffset + col] = x[col] * lmem[rowOffset + col];
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    // The row-wi calculates the sum and writes the result (could be made O(log(n)) ?)
+    if (col == row) {
+      double sum = lmem[rowOffset + rows];
+      for (int i = row + 1; i < cols; ++i)
+        sum -= lmem[resultOffset + i];
+      x[row] = sum / lmem[rowOffset + row];
+    }
+  }
+}

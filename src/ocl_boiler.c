@@ -185,9 +185,7 @@ void clFreeStatus(cl_status *status)
 	cl_int err;
 	err = clReleaseProgram(status->prog);
 	ocl_check(err, "release program");
-	err = clRetainCommandQueue(status->que);
-	ocl_check(err, "release queue");
-	err = clRetainContext(status->ctx);
+	err = clReleaseContext(status->ctx);
 	ocl_check(err, "release context");
 	err = clReleaseDevice(status->d);
 	ocl_check(err, "release device");
