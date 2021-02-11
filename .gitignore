@@ -38,3 +38,6 @@ bin/
 
 # VsCode
 .vscode/
+
+# Documentation
+docs/documentation/
