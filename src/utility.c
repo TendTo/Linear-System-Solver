@@ -1,5 +1,21 @@
 #include "utility.h"
 
+float *d_to_f_array(double *a, size_t n)
+{
+    float *x = (float *)malloc(sizeof(float) * n);
+    for (size_t i = 0; i < n; ++i)
+        x[i] = (float)a[i];
+    return x;
+}
+
+double *f_to_d_array(float *a, size_t n)
+{
+    double *x = (double *)malloc(sizeof(double) * n);
+    for (size_t i = 0; i < n; ++i)
+        x[i] = (double)a[i];
+    return x;
+}
+
 double *create_complete_matrix_lin(double *A, double *b, size_t n)
 {
     //Complete matrix

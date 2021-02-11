@@ -16,7 +16,27 @@
 #define PRECISION 0.0001 //Error accepted when dealing with doubles
 
 /**
- * Copy the given linear matrix A to a newly created linear matrix.
+ * Casts each value in the array from double to float
+ * 
+ * @param A Array to cast
+ * @param n Length of the array
+ * 
+ * @return Pointer to the array with the correct type
+ */
+float *d_to_f_array(double *a, size_t n);
+
+/**
+ * Casts each value in the array from float to double
+ * 
+ * @param A Array to cast
+ * @param n Length of the array
+ * 
+ * @return Pointer to the array with the correct type
+ */
+double *f_to_d_array(float *a, size_t n);
+
+/**
+ * Copies the given linear matrix A to a newly created linear matrix.
  * If a b vector is given, it is assimilated al a new column of the new matrix, wich will be (n X n + 1)
  * 
  * @param A Linear matrix to copy. If b is NULL, it will be assumed to have size (n X n + 1)
