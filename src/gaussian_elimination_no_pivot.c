@@ -115,7 +115,7 @@ double *Gaussian_elimination_no_pivot_gpu_lmem(double *A, double *b, size_t n, c
     printf("-----\n");
     printf("GPU no pivot lmem\n");
     printf("Gaussian_evt:\truntime %lu ns\t%.4g GE/s\t%.4g GB/s\n",
-           gaussian_evt_rn, (3 * (1 << (rows - 1))) / (double)gaussian_evt_rn, 3 * U_memsize / 2.0 / gaussian_evt_rn);
+           gaussian_evt_rn, (rows * cols + rows) / (double)gaussian_evt_rn, (U_memsize + x_memsize) / (double)gaussian_evt_rn);
     printf("Read_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
            read_evt_rn, rows / (double)read_evt_rn, x_memsize / (double)read_evt_rn);
 #if 0
@@ -134,7 +134,7 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
         fprintf(stderr, "[error] null status");
         return NULL;
     }
-    cl_int rows = n, cols = n + 1, err;
+    cl_int rows = n, cols = n + 1, gaussian_wi = 0, err;
     size_t U_memsize = sizeof(float) * rows * cols;
     size_t x_memsize = sizeof(float) * rows;
 
@@ -189,6 +189,8 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
     cl_mem d_in_U = d_even_U, d_out_U = d_odd_U;
     for (int i = 0; i < rows - 1; ++i)
     {
+        gaussian_wi += gws[0] * gws[1]; // Number of work-item in the kernel
+
         err = clSetKernelArg(gaussian_k, 0, sizeof(cl_int), &i);
         ocl_check(err, "set arg 0 for gaussian_k");
         err = clSetKernelArg(gaussian_k, 1, sizeof(d_in_U), &d_in_U);
@@ -261,11 +263,11 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
     printf("-----\n");
     printf("GPU no pivot tex\n");
     printf("Gaussian_evt:\truntime %lu ns\t%.4g GE/s\t%.4g GB/s\n",
-           gaussian_evt_rn, (3 * (1 << (rows - 1))) / (double)gaussian_evt_rn, 3 * U_memsize / 2.0 / gaussian_evt_rn);
+           gaussian_evt_rn, (5.0 * gaussian_wi) / gaussian_evt_rn, (5.0 * gaussian_wi * sizeof(float)) / gaussian_evt_rn);
     printf("Solve_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
-           solve_evt_rn, rows * cols / 2.0 / solve_evt_rn, (3 * U_memsize / 2.0 + x_memsize) / solve_evt_rn);
+           solve_evt_rn, (rows * cols / 2.0 + rows) / solve_evt_rn, (U_memsize / 2.0 + x_memsize) / solve_evt_rn);
     printf("Read_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
-           read_evt_rn, rows / (double)read_evt_rn, x_memsize / (double)read_evt_rn);
+           read_evt_rn, rows / (float)read_evt_rn, x_memsize / (float)read_evt_rn);
 #if 0
     cl_ulong unmap_evt_rn = runtime_ns(unmap_evt);
     printf("Unmap_evt runtime:\t%lu ns\n", unmap_evt_rn);
@@ -282,7 +284,7 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
         fprintf(stderr, "[error] null status");
         return NULL;
     }
-    cl_int rows = n, cols = n + 1, err;
+    cl_int rows = n, cols = n + 1, gaussian_wi = 0, err;
     size_t U_memsize = sizeof(double) * rows * cols;
     size_t x_memsize = sizeof(double) * rows;
 
@@ -317,6 +319,8 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
     //Enqueue the events
     for (int i = 0; i < rows - 1; ++i)
     {
+        gaussian_wi += gws[0] * gws[1]; // Number of work-item in the kernel
+
         err = clSetKernelArg(gaussian_k, 0, sizeof(cl_int), &rows);
         ocl_check(err, "set arg 0 for gaussian_k");
         err = clSetKernelArg(gaussian_k, 1, sizeof(cl_int), &cols);
@@ -397,9 +401,9 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
     printf("-----\n");
     printf("GPU no pivot buffer\n");
     printf("Gaussian_evt:\truntime %lu ns\t%.4g GE/s\t%.4g GB/s\n",
-           gaussian_evt_rn, (3 * (1 << (rows - 1))) / (double)gaussian_evt_rn, 3 * U_memsize / 2.0 / gaussian_evt_rn);
+           gaussian_evt_rn, (5.0 * gaussian_wi) / gaussian_evt_rn, (5.0 * gaussian_wi * sizeof(double)) / gaussian_evt_rn);
     printf("Solve_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
-           solve_evt_rn, rows * cols / 2.0 / solve_evt_rn, (3 * U_memsize / 2.0 + x_memsize) / solve_evt_rn);
+           solve_evt_rn, (rows * cols / 2.0 + rows) / solve_evt_rn, (U_memsize / 2.0 + x_memsize) / solve_evt_rn);
     printf("Read_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
            read_evt_rn, rows / (double)read_evt_rn, x_memsize / (double)read_evt_rn);
 #if 0
