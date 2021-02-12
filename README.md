@@ -40,9 +40,8 @@ Small application that aims to solve systems of linear equations using the gener
 - The test runner will be found in the bin folder, while all the object files will be in the build folder
 
 ## :books: Documentation
-Check the gh-pages branch
-
-[Table of contents](docs/Table-of-contents.md)
+[Table of contents](docs/Table-of-contents.md)  
+[Code documentation](https://tendto.github.io/Linear-System-Solver/index.html)
 
 ## Credits
 - [Giuseppe Bilotta](https://github.com/Oblomov) for the _ocl_boiler.h_ (and for teaching me all the OpenCL fundamentals and more)
