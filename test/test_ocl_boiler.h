@@ -2,19 +2,6 @@
 #include "ocl_boiler.h"
 #include "utility.h"
 
-// START_TEST(test_create_queue)
-// {
-//     cl_platform_id p = select_platform();
-//     ck_assert(p);
-//     cl_device_id d = select_device(p);
-//     ck_assert(d);
-//     cl_context ctx = create_context(p, d);
-//     ck_assert(ctx);
-//     cl_command_queue que = create_queue(ctx, d);
-//     ck_assert(que);
-// }
-// END_TEST
-
 START_TEST(test_round_mul_up)
 {
     size_t result;
@@ -88,7 +75,6 @@ Suite *ocl_boiler_suite(void)
     s = suite_create("ocl_boiler");
     tc_core = tcase_create("core");
 
-    //tcase_add_test(tc_core, test_create_queue);
     tcase_add_test(tc_core, test_round_mul_up);
     tcase_add_test(tc_core, test_simple_cl_application);
 

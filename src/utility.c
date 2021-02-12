@@ -120,14 +120,14 @@ void print_mat_lin(double *m, size_t rows, size_t cols, char label)
     printf("]\n");
 }
 
-int compare_arr(double *a, double *b, size_t n)
+int compare_arr(double *a, const double *b, size_t n)
 {
     for (size_t i = 0; i < n; ++i)
     {
         double difference = a[i] - b[i];
         if (difference > PRECISION || difference < -PRECISION)
         {
-#ifndef TEST
+#ifdef TEST
             fprintf(stderr, "[ERROR] %f != %f\n", a[i], b[i]);
 #endif
             return 0;

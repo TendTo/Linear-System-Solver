@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define PRECISION 0.0001 //Error accepted when dealing with doubles
+#define PRECISION 0.1 //Error accepted when dealing with doubles
 
 /**
  * Casts each value in the array from double to float
@@ -95,7 +95,7 @@ void print_mat_lin(double *m, size_t rows, size_t cols, char label);
  * 
  * @return Whether or not the two arrays contain the same values
  */
-int compare_arr(double *a, double *b, size_t n);
+int compare_arr(double *a, const double *b, size_t n);
 
 /**
  * Compares two square matrices to check if all the values are the same
