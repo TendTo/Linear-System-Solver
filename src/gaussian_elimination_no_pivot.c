@@ -113,7 +113,7 @@ double *Gaussian_elimination_no_pivot_gpu_lmem(double *A, double *b, size_t n, c
     cl_ulong read_evt_rn = runtime_ns(read_evt);
 
     printf("-----\n");
-    printf("GPU no pivot lmem\n");
+    printf("GPU no pivot lmem | n: %ld\n", n);
     printf("Gaussian_evt:\truntime %lu ns\t%.4g GE/s\t%.4g GB/s\n",
            gaussian_evt_rn, (rows * cols + rows) / (double)gaussian_evt_rn, (U_memsize + x_memsize) / (double)gaussian_evt_rn);
     printf("Read_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
@@ -261,9 +261,9 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
     solve_evt_rn = runtime_ns(solve_evt);
     read_evt_rn = runtime_ns(read_evt);
     printf("-----\n");
-    printf("GPU no pivot tex\n");
+    printf("GPU no pivot tex | n: %ld\n", n);
     printf("Gaussian_evt:\truntime %lu ns\t%.4g GE/s\t%.4g GB/s\n",
-           gaussian_evt_rn, (5.0 * gaussian_wi) / gaussian_evt_rn, (5.0 * gaussian_wi * sizeof(float)) / gaussian_evt_rn);
+           gaussian_evt_rn, (2.0 * gaussian_wi) / gaussian_evt_rn, (2.0 * gaussian_wi * sizeof(float)) / gaussian_evt_rn);
     printf("Solve_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
            solve_evt_rn, (rows * cols / 2.0 + rows) / solve_evt_rn, (U_memsize / 2.0 + x_memsize) / solve_evt_rn);
     printf("Read_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
@@ -399,9 +399,9 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
     solve_evt_rn = runtime_ns(solve_evt);
     read_evt_rn = runtime_ns(read_evt);
     printf("-----\n");
-    printf("GPU no pivot buffer\n");
+    printf("GPU no pivot buffer | n: %ld\n", n);
     printf("Gaussian_evt:\truntime %lu ns\t%.4g GE/s\t%.4g GB/s\n",
-           gaussian_evt_rn, (5.0 * gaussian_wi) / gaussian_evt_rn, (5.0 * gaussian_wi * sizeof(double)) / gaussian_evt_rn);
+           gaussian_evt_rn, (2.0 * gaussian_wi) / gaussian_evt_rn, (2.0 * gaussian_wi * sizeof(double)) / gaussian_evt_rn);
     printf("Solve_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
            solve_evt_rn, (rows * cols / 2.0 + rows) / solve_evt_rn, (U_memsize / 2.0 + x_memsize) / solve_evt_rn);
     printf("Read_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
