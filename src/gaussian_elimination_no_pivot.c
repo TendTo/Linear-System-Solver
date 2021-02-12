@@ -175,7 +175,7 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
 
     //Kernel settings
     size_t gws[] = {cols - 1, rows - 1};
-    //size_t lws[] = {cols, rows}; //To make sure there is only one workgroup
+    size_t lws[] = {16, 16};
 
     cl_event upload_evt, gaussian_evt, solve_evt, read_evt, unmap_evt;
     cl_ulong gaussian_evt_rn = 0, solve_evt_rn = 0, read_evt_rn = 0;
@@ -189,6 +189,9 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
     cl_mem d_in_U = d_even_U, d_out_U = d_odd_U;
     for (int i = 0; i < rows - 1; ++i)
     {
+        //Reduce the number of workitems
+        gws[0] = round_mul_up(cols - 1 - i, lws[0]);
+        gws[1] = round_mul_up(rows - 1 - i, lws[1]);
         gaussian_wi += gws[0] * gws[1]; // Number of work-item in the kernel
 
         err = clSetKernelArg(gaussian_k, 0, sizeof(cl_int), &i);
@@ -199,7 +202,7 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
         ocl_check(err, "set arg 2 for gaussian_k");
 
         err = clEnqueueNDRangeKernel(status->que, gaussian_k,
-                                     2, NULL, gws, NULL,
+                                     2, NULL, gws, lws,
                                      1, &upload_evt, &gaussian_evt);
         ocl_check(err, "enqueue gaussian_k");
 
@@ -208,14 +211,11 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
         d_in_U = d_out_U;
         d_out_U = d_temp;
 
-        //Reduce the number of workitems
-        --gws[0];
-        --gws[1];
         clWaitForEvents(1, &gaussian_evt);
         gaussian_evt_rn += runtime_ns(gaussian_evt);
     }
     gws[0] = rows;
-    size_t lws[] = {rows};
+    lws[0] = rows;
 
     err = clSetKernelArg(solve_k, 0, sizeof(d_even_U), &d_even_U);
     ocl_check(err, "set arg 0 for solve_k");
@@ -254,6 +254,7 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
     if (b)
         free(h_U);
     clReleaseKernel(gaussian_k);
+    clReleaseKernel(solve_k);
     clReleaseMemObject(d_even_U);
     clReleaseMemObject(d_odd_U);
     clReleaseMemObject(d_x);
@@ -310,7 +311,7 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
 
     //Kernel settings
     size_t gws[] = {cols - 1, rows - 1};
-    //size_t lws[] = {cols, rows}; //To make sure there is only one workgroup
+    size_t lws[] = {16, 16};
 
     cl_event gaussian_evt, solve_evt, read_evt, unmap_evt;
     cl_ulong gaussian_evt_rn = 0, solve_evt_rn = 0, read_evt_rn = 0;
@@ -319,6 +320,9 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
     //Enqueue the events
     for (int i = 0; i < rows - 1; ++i)
     {
+        //Reduce the number of workitems
+        gws[0] = round_mul_up(cols - 1 - i, lws[0]);
+        gws[1] = round_mul_up(rows - 1 - i, lws[1]);
         gaussian_wi += gws[0] * gws[1]; // Number of work-item in the kernel
 
         err = clSetKernelArg(gaussian_k, 0, sizeof(cl_int), &rows);
@@ -333,7 +337,7 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
         ocl_check(err, "set arg 4 for gaussian_k");
 
         err = clEnqueueNDRangeKernel(status->que, gaussian_k,
-                                     2, NULL, gws, NULL,
+                                     2, NULL, gws, lws,
                                      0, NULL, &gaussian_evt);
         ocl_check(err, "enqueue gaussian_k");
 
@@ -342,14 +346,11 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
         d_in_U = d_out_U;
         d_out_U = d_temp;
 
-        //Reduce the number of workitems
-        --gws[0];
-        --gws[1];
         clWaitForEvents(1, &gaussian_evt);
         gaussian_evt_rn += runtime_ns(gaussian_evt);
     }
     gws[0] = rows;
-    size_t lws[] = {rows};
+    lws[0] = rows;
 
     err = clSetKernelArg(solve_k, 0, sizeof(cl_int), &rows);
     ocl_check(err, "set arg 0 for solve_k");
@@ -392,6 +393,7 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
     if (b)
         free(h_U);
     clReleaseKernel(gaussian_k);
+    clReleaseKernel(solve_k);
     clReleaseMemObject(d_even_U);
     clReleaseMemObject(d_odd_U);
     clReleaseMemObject(d_x);
