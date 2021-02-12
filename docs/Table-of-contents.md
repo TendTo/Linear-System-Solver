@@ -1,6 +1,6 @@
 # Table of contents
 
-- **[Gaussian reduction](Gaussian-reduction.md)**
+- **[Gaussian elimination](Gaussian-elimination.md)**
 
 ---
 

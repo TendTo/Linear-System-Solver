@@ -37,7 +37,7 @@ double *f_to_d_array(float *a, size_t n);
 
 /**
  * Copies the given linear matrix A to a newly created linear matrix.
- * If a b vector is given, it is assimilated al a new column of the new matrix, wich will be (n X n + 1)
+ * If a b vector is given, it is assimilated as a new column of the new matrix, wich will be (n X n + 1)
  * 
  * @param A Linear matrix to copy. If b is NULL, it will be assumed to have size (n X n + 1)
  * @param b Vector of the solutions to append as a new column. If NULL, the first matrix will be considered as having it already in it
@@ -46,6 +46,18 @@ double *f_to_d_array(float *a, size_t n);
  * @return Complete matrix of size (n X n + 1)
  */
 double *create_complete_matrix_lin(double *A, double *b, size_t n);
+
+/**
+ * Copies the given linear matrix A to a newly created linear matrix.
+ * If a b vector is given, it is assimilated as a new column of the new matrix, wich will be (n X n + 1)
+ * 
+ * @param A Linear matrix to copy. If b is NULL, it will be assumed to have size (n X n + 1)
+ * @param b Vector of the solutions to append as a new column. If NULL, the first matrix will be considered as having it already in it
+ * @param n Number of unknowns
+ * 
+ * @return Complete matrix of size (n X n + 1)
+ */
+float *create_complete_matrix_lin_f(float *A, float *b, size_t n);
 
 /**
  * Prints out the content of an array in a human readable format

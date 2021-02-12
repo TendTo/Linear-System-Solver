@@ -1,13 +1,14 @@
 #include <check.h>
 #include "test_ocl_boiler.h"
 #include "test_utility.h"
-#include "test_gaussian_reduction.h"
+#include "test_gaussian_elimination_no_pivot.h"
+#include "test_gaussian_elimination_pivot.h"
 
-#define NSUITE 3
+#define NSUITE 4
 
 int main(void)
 {
-    Suite *(*suite_creators[NSUITE])(void) = {utility_suite, gaussian_reduction_suite, ocl_boiler_suite};
+    Suite *(*suite_creators[NSUITE])(void) = {utility_suite, gaussian_elimination_no_pivot_suite, gaussian_elimination_pivot_suite, ocl_boiler_suite};
 
     int no_failed = 0;
     Suite *s;

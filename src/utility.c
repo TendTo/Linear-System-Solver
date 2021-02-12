@@ -45,6 +45,35 @@ double *create_complete_matrix_lin(double *A, double *b, size_t n)
     return U;
 }
 
+float *create_complete_matrix_lin_f(float *A, float *b, size_t n)
+{
+    //Complete matrix
+    float *U = (float *)malloc(sizeof(float) * (n * n + n));
+
+    if (b)
+    {
+        for (size_t i = 0; i < n; ++i)
+        {
+            for (size_t j = 0; j < n; ++j)
+            {
+                U[i * n + j + i] = A[i * n + j];
+            }
+            U[i * n + n + i] = b[i];
+        }
+    }
+    else
+    {
+        for (size_t i = 0; i < n; ++i)
+        {
+            for (size_t j = 0; j < n + 1; ++j)
+            {
+                U[i * (n + 1) + j] = A[i * (n + 1) + j];
+            }
+        }
+    }
+    return U;
+}
+
 void print_arr(double *m, size_t n, char label)
 {
     if (label != '\0')

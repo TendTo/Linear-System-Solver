@@ -1,6 +1,6 @@
-#include "gaussian_reduction.h"
+#include "gaussian_elimination_no_pivot.h"
 
-double *Gaussian_reduction_no_pivot(double *A, double *b, size_t n)
+double *Gaussian_elimination_no_pivot(double *A, double *b, size_t n)
 {
     size_t n_complete = n + 1;
     double *U = create_complete_matrix_lin(A, b, n);
@@ -37,66 +37,7 @@ double *Gaussian_reduction_no_pivot(double *A, double *b, size_t n)
     return x;
 }
 
-double *Gaussian_reduction_pivot(double *A, double *b, size_t n)
-{
-    size_t n_complete = n + 1;
-    double *U = create_complete_matrix_lin(A, b, n);
-    double *x = (double *)malloc(sizeof(double) * n);
-    memset(x, 0, sizeof(double) * n);
-
-    for (size_t i = 0; i < n - 1; ++i)
-    {
-
-        size_t pivot = i;
-        double maxPivot = 0.0;
-
-        //Find the best pivot
-        for (size_t ii = i; ii < n; ++ii)
-        {
-            if (fabs(U[ii * n_complete + i]) > maxPivot)
-            {
-                maxPivot = fabs(U[ii * n_complete + i]);
-                pivot = ii;
-            }
-        }
-        //Check if the system is still solvable
-        // if (fabs(maxPivot) < 0.01f)
-
-        //If the pivot was found in another row, invert the two rows
-        if (pivot != i)
-        {
-            for (size_t ii = 0; ii < n_complete; ++ii)
-                swap(&U[pivot * n_complete + ii], &U[i * n_complete + ii]);
-        }
-        pivot = i;
-        for (size_t row = pivot + 1; row < n; ++row)
-        {
-            double mult = -U[row * n_complete + pivot] / U[pivot * n_complete + pivot];
-            U[row * n_complete + pivot] = 0.0;
-            for (size_t col = pivot + 1; col < n_complete; ++col)
-            {
-                U[row * n_complete + col] += U[pivot * n_complete + col] * mult;
-            }
-        }
-    }
-
-    //After the A matrix is made into a triangular matrix, solve the simplified system
-    for (int row = n - 1; row >= 0; --row)
-    {
-        double sum = U[row * n_complete + n];
-
-        //Adjust the current sum by subtracting the values already found
-        for (int intern_row = row + 1; intern_row < n; ++intern_row)
-            sum -= x[intern_row] * U[row * n_complete + intern_row];
-
-        x[row] = sum / U[row * n_complete + row];
-    }
-    //print_mat_lin(U, n, n_complete, 'U');
-    free(U);
-    return x;
-}
-
-double *Gaussian_reduction_no_pivot_gpu_lmem(double *A, double *b, size_t n, cl_status *status)
+double *Gaussian_elimination_no_pivot_gpu_lmem(double *A, double *b, size_t n, cl_status *status)
 {
     if (!status)
     {
@@ -120,8 +61,8 @@ double *Gaussian_reduction_no_pivot_gpu_lmem(double *A, double *b, size_t n, cl_
     ocl_check(err, "create output buffer");
 
     //Create kernel
-    cl_kernel init_mat_k = clCreateKernel(status->prog, "gaussian_reduction_no_pivot_lmem", &err);
-    ocl_check(err, "create gaussian_reduction_naive kernel");
+    cl_kernel init_mat_k = clCreateKernel(status->prog, "gaussian_elimination_no_pivot_lmem", &err);
+    ocl_check(err, "create gaussian_elimination_naive kernel");
 
     size_t gws[] = {cols};
     size_t lws[] = {cols}; //To make sure there is only one workgroup
@@ -132,7 +73,7 @@ double *Gaussian_reduction_no_pivot_gpu_lmem(double *A, double *b, size_t n, cl_
     ocl_check(err, "set arg 1 for init_mat_k");
     err = clSetKernelArg(init_mat_k, 2, sizeof(d_x), &d_x);
     ocl_check(err, "set arg 2 for init_mat_k");
-    err = clSetKernelArg(init_mat_k, 3, U_memsize + x_memsize, NULL);
+    err = clSetKernelArg(init_mat_k, 3, U_memsize + 2 * x_memsize, NULL);
     ocl_check(err, "set arg 3 for init_mat_k");
 
     cl_event gaussian_evt, read_evt, unmap_evt;
@@ -141,7 +82,7 @@ double *Gaussian_reduction_no_pivot_gpu_lmem(double *A, double *b, size_t n, cl_
     err = clEnqueueNDRangeKernel(status->que, init_mat_k,
                                  1, NULL, gws, lws,
                                  0, NULL, &gaussian_evt);
-    ocl_check(err, "enqueue gaussian_reduction");
+    ocl_check(err, "enqueue gaussian_elimination");
 
 #if 1
     err = clEnqueueReadBuffer(status->que, d_x, CL_TRUE,
@@ -168,11 +109,15 @@ double *Gaussian_reduction_no_pivot_gpu_lmem(double *A, double *b, size_t n, cl_
     clReleaseMemObject(d_U);
     clReleaseMemObject(d_x);
 #if TEST
-    cl_ulong init_evt_rn = runtime_ns(gaussian_evt);
+    cl_ulong gaussian_evt_rn = runtime_ns(gaussian_evt);
     cl_ulong read_evt_rn = runtime_ns(read_evt);
 
-    printf("-----\nGaussian_evt runtime:\t%lu ns\n", init_evt_rn);
-    printf("Read_evt runtime:\t%lu ns\n", read_evt_rn);
+    printf("-----\n");
+    printf("GPU no pivot lmem\n");
+    printf("Gaussian_evt:\truntime %lu ns\t%.4g GE/s\t%.4g GB/s\n",
+           gaussian_evt_rn, (3 * (1 << (rows - 1))) / (double)gaussian_evt_rn, 3 * U_memsize / 2.0 / gaussian_evt_rn);
+    printf("Read_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
+           read_evt_rn, rows / (double)read_evt_rn, x_memsize / (double)read_evt_rn);
 #if 0
     cl_ulong unmap_evt_rn = runtime_ns(unmap_evt);
     printf("Unmap_evt runtime:\t%lu ns\n", unmap_evt_rn);
@@ -182,7 +127,7 @@ double *Gaussian_reduction_no_pivot_gpu_lmem(double *A, double *b, size_t n, cl_
     return h_x;
 }
 
-float *Gaussian_reduction_no_pivot_gpu_texture(float *A, float *b, size_t n, cl_status *status)
+float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, cl_status *status)
 {
     if (!status)
     {
@@ -195,7 +140,7 @@ float *Gaussian_reduction_no_pivot_gpu_texture(float *A, float *b, size_t n, cl_
 
     float *h_U = NULL, *h_x = (float *)malloc(x_memsize);
     if (b)
-        h_U = create_complete_matrix_lin(A, b, n);
+        h_U = create_complete_matrix_lin_f(A, b, n);
     else
         h_U = A;
 
@@ -214,7 +159,7 @@ float *Gaussian_reduction_no_pivot_gpu_texture(float *A, float *b, size_t n, cl_
 
     //Create memory objects
     cl_mem d_even_U = clCreateImage(status->ctx, CL_MEM_READ_WRITE,
-                                  &tex_fmt, &tex_desc, NULL, &err);
+                                    &tex_fmt, &tex_desc, NULL, &err);
     ocl_check(err, "create input tex 1");
     cl_mem d_odd_U = clCreateImage(status->ctx, CL_MEM_READ_WRITE,
                                    &tex_fmt, &tex_desc, NULL, &err);
@@ -223,10 +168,10 @@ float *Gaussian_reduction_no_pivot_gpu_texture(float *A, float *b, size_t n, cl_
     ocl_check(err, "create output buffer");
 
     //Create kernel
-    cl_kernel gaussian_k = clCreateKernel(status->prog, "gaussian_reduction_no_pivot_texture", &err);
-    ocl_check(err, "create gaussian_reduction_no_pivot_texture kernel");
-    cl_kernel solve_k = clCreateKernel(status->prog, "gaussian_reduction_solve_texture", &err);
-    ocl_check(err, "create gaussian_reduction_no_pivot_texture kernel");
+    cl_kernel gaussian_k = clCreateKernel(status->prog, "gaussian_elimination_no_pivot_texture", &err);
+    ocl_check(err, "create gaussian_elimination_no_pivot_texture kernel");
+    cl_kernel solve_k = clCreateKernel(status->prog, "gaussian_elimination_solve_texture", &err);
+    ocl_check(err, "create gaussian_elimination_no_pivot_texture kernel");
 
     //Kernel settings
     size_t gws[] = {cols - 1, rows - 1};
@@ -314,6 +259,7 @@ float *Gaussian_reduction_no_pivot_gpu_texture(float *A, float *b, size_t n, cl_
     solve_evt_rn = runtime_ns(solve_evt);
     read_evt_rn = runtime_ns(read_evt);
     printf("-----\n");
+    printf("GPU no pivot tex\n");
     printf("Gaussian_evt:\truntime %lu ns\t%.4g GE/s\t%.4g GB/s\n",
            gaussian_evt_rn, (3 * (1 << (rows - 1))) / (double)gaussian_evt_rn, 3 * U_memsize / 2.0 / gaussian_evt_rn);
     printf("Solve_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
@@ -329,7 +275,7 @@ float *Gaussian_reduction_no_pivot_gpu_texture(float *A, float *b, size_t n, cl_
     return h_x;
 }
 
-double *Gaussian_reduction_no_pivot_gpu_buffer(double *A, double *b, size_t n, cl_status *status)
+double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n, cl_status *status)
 {
     if (!status)
     {
@@ -355,10 +301,10 @@ double *Gaussian_reduction_no_pivot_gpu_buffer(double *A, double *b, size_t n, c
     ocl_check(err, "create output buffer");
 
     //Create kernel
-    cl_kernel gaussian_k = clCreateKernel(status->prog, "gaussian_reduction_no_pivot_buffer", &err);
-    ocl_check(err, "create gaussian_reduction_no_pivot_buffer kernel");
-    cl_kernel solve_k = clCreateKernel(status->prog, "gaussian_reduction_solve_buffer", &err);
-    ocl_check(err, "create gaussian_reduction_solve_buffer kernel");
+    cl_kernel gaussian_k = clCreateKernel(status->prog, "gaussian_elimination_no_pivot_buffer", &err);
+    ocl_check(err, "create gaussian_elimination_no_pivot_buffer kernel");
+    cl_kernel solve_k = clCreateKernel(status->prog, "gaussian_elimination_solve_buffer", &err);
+    ocl_check(err, "create gaussian_elimination_solve_buffer kernel");
 
     //Kernel settings
     size_t gws[] = {cols - 1, rows - 1};
@@ -449,6 +395,7 @@ double *Gaussian_reduction_no_pivot_gpu_buffer(double *A, double *b, size_t n, c
     solve_evt_rn = runtime_ns(solve_evt);
     read_evt_rn = runtime_ns(read_evt);
     printf("-----\n");
+    printf("GPU no pivot buffer\n");
     printf("Gaussian_evt:\truntime %lu ns\t%.4g GE/s\t%.4g GB/s\n",
            gaussian_evt_rn, (3 * (1 << (rows - 1))) / (double)gaussian_evt_rn, 3 * U_memsize / 2.0 / gaussian_evt_rn);
     printf("Solve_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",

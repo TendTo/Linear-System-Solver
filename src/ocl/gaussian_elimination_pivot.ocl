@@ -29,7 +29,7 @@ Bruteforce print_mat_lin
 
 constant sampler_t s = CLK_NORMALIZED_COORDS_FALSE;
 
-kernel void gaussian_reduction_no_pivot_lmem(int cols, global double *U,
+kernel void gaussian_elimination_pivot_lmem(int cols, global double *U,
                                              global double *x,
                                              local double *lmem) {
   const int col = get_global_id(0);
@@ -84,7 +84,7 @@ kernel void gaussian_reduction_no_pivot_lmem(int cols, global double *U,
   }
 }
 
-kernel void gaussian_reduction_no_pivot_texture(int pivot,
+kernel void gaussian_elimination_pivot_texture(int pivot,
                                                 image2d_t read_only in_U,
                                                 image2d_t write_only out_U) {
   const int col = get_global_id(0) + pivot + 1;
@@ -109,7 +109,7 @@ kernel void gaussian_reduction_no_pivot_texture(int pivot,
   write_imagef(out_U, (int2)(col, row), (float4)(new_val, 0.0f, 0.0f, 1.0f));
 }
 
-kernel void gaussian_reduction_solve_texture(image2d_t read_only in_U,
+kernel void gaussian_elimination_solve_texture(image2d_t read_only in_U,
                                              image2d_t read_only odd_U,
                                              global float *x,
                                              local float *lmem) {
@@ -150,7 +150,7 @@ kernel void gaussian_reduction_solve_texture(image2d_t read_only in_U,
   x[col] = lmem[rows + col];
 }
 
-kernel void gaussian_reduction_no_pivot_buffer(int rows, int cols, int pivot,
+kernel void gaussian_elimination_pivot_buffer(int rows, int cols, int pivot,
                                                global double *in_U,
                                                global double *out_U) {
   const int col = get_global_id(0) + pivot + 1;
@@ -173,7 +173,7 @@ kernel void gaussian_reduction_no_pivot_buffer(int rows, int cols, int pivot,
   out_U[row * cols + col] = new_val;
 }
 
-kernel void gaussian_reduction_solve_buffer(int rows, int cols,
+kernel void gaussian_elimination_solve_buffer(int rows, int cols,
                                             global double *even_U,
                                             global double *odd_U,
                                             global double *x,

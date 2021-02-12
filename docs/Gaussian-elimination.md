@@ -1,12 +1,12 @@
-# Gaussian reduction
+# Gaussian elimination
 
 ## Complete explanation
 [Wikipedia](https://en.wikipedia.org/wiki/Gaussian_elimination)
 
 ## Brief explanation
 
-Gaussian reduction (also known as Gaussian elimination or row reduction) is an algorithm in linear algebra for solving a system of linear equations.  
-To perform row reduction on a matrix, one uses a sequence of elementary row operations to modify the matrix until the lower left-hand corner of the matrix is filled with zeros, as much as possible. There are three types of elementary row operations:
+Gaussian elimination (also known as Gauss-Jordan elimination or row reduction) is an algorithm in linear algebra for solving a system of linear equations.  
+To perform row reduction on a matrix, a sequence of elementary row operations are used to modify the matrix until the lower left-hand corner of the matrix is filled with zeros, as much as possible. There are three types of elementary row operations:
 - Swapping two rows
 - Multiplying a row by a nonzero number
 - Adding a multiple of one row to another row
@@ -30,7 +30,7 @@ Since there is no way to force synchronization in the global memory, the only tw
 
 ### **No pivot lmem**
 
-Simplest implementation of a Gaussian reduction where the pivots are chosen in based on the order of rows.  
+Simplest implementation of a Gaussian elimination where the pivots are chosen in based on the order of rows.  
 The whole matrix is stored in the local memory of size (**n + 2** X **n + 1**) and all the work-items belong to the same work-group, so that they share the same local memory.
 
 The parallelization only concerns the fact that the work-items go through each row in parallel, each on a specific column.
@@ -54,7 +54,7 @@ Finally, for each row the corrisponding unknown's value is calculate, storing th
 
 ### **No pivot tex**
 
-Simplest implementation of a Gaussian reduction where the pivots are chosen in based on the order of rows.  
+Simplest implementation of a Gaussian elimination where the pivots are chosen in based on the order of rows.  
 The whole matrix is stored in a texture. Another one with the same dimensions is created. The two textures are used alternately as input or output, a ping pong of sorts.  
 The result is that the odd reduced rows will be on one texture, while the even ones will be on the other.
 
@@ -85,7 +85,7 @@ For each row, the corrisponding unknown's value is calculate, storing the temora
 
 ### **No pivot buffer**
 
-Simplest implementation of a Gaussian reduction where the pivots are chosen in based on the order of rows.  
+Simplest implementation of a Gaussian elimination where the pivots are chosen in based on the order of rows.  
 The whole matrix is stored in a buffer. Another one with the same dimensions is created. The two buffers are used alternately as input or output, a ping pong of sorts.  
 The result is that the odd reduced rows will be on one buffer, while the even ones will be on the other.
 

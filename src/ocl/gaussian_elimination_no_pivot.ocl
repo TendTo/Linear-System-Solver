@@ -1,0 +1,209 @@
+/*
+Bruteforce print_mat_lin
+
+  if (col == 0) {
+    printf("[\n");
+    for (int i = 0; i < rows; ++i) {
+      printf("\t[");
+      for (int j = 0; j < cols - 1; j++)
+        printf(" %.2f,", U[i * cols + j]);
+      printf(" %.2f ", U[i * cols + cols - 1]);
+      printf("]\n");
+    }
+    printf("]\n");
+  }
+
+    if (get_global_id(0) == 0) {
+    for (int i = 0; i < rows; ++i) {
+      printf("[ ");
+      for (int j = 0; j < cols; ++j) {
+        int2 coords = (int2)(j, i);
+        float4 cVal = read_imagef(in_U, s, coords);
+        printf("x: %f ", cVal.s0);
+      }
+      printf("]\n");
+    }
+    printf("\n");
+  }
+*/
+
+constant sampler_t s = CLK_NORMALIZED_COORDS_FALSE;
+
+kernel void gaussian_elimination_no_pivot_lmem(int cols, global double *U,
+                                             global double *x,
+                                             local double *lmem) {
+  const int col = get_global_id(0);
+
+  // TODO: alter this check, since now it can cause a deadlock
+  if (col >= cols)
+    return;
+
+  const int rows = cols - 1;
+  const int resultOffset = rows * cols;
+  const int solutionOffset = resultOffset + cols;
+
+  // Copy everything in local memeory (feasible for larger matrices ?)
+  for (int i = 0; i < rows; ++i) {
+    lmem[i * cols + col] = U[i * cols + col];
+  }
+  barrier(CLK_LOCAL_MEM_FENCE);
+
+  // Execute all the reductions
+  for (int pivot = 0; pivot < rows - 1; ++pivot) {
+    for (int row = pivot + 1; row < rows; ++row) {
+      int rowOffset = row * cols;
+      int pivotOffset = pivot * cols;
+      double mult = -lmem[rowOffset + pivot] / lmem[pivotOffset + pivot];
+
+      if (col > pivot)
+        lmem[rowOffset + col] += lmem[pivotOffset + col] * mult;
+      else
+        lmem[rowOffset + col] = 0;
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+  }
+
+  // Exclude the result-column-wi
+  if (col == cols - 1)
+    return;
+
+  // Calculate the result vector
+  for (int row = rows - 1; row >= 0; --row) {
+    int rowOffset = row * cols;
+
+    if (col > row)
+      lmem[resultOffset + col] = lmem[solutionOffset + col] * lmem[rowOffset + col];
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    // The row-wi calculates the sum and writes the result (maybe O(log(n)?)
+    if (col == row) {
+      double sum = lmem[rowOffset + rows];
+      for (int i = row + 1; i < cols; ++i)
+        sum -= lmem[resultOffset + i];
+      lmem[solutionOffset + col] = sum / lmem[rowOffset + row];
+    }
+  }
+
+  x[col] = lmem[solutionOffset + col];
+}
+
+kernel void gaussian_elimination_no_pivot_texture(int pivot,
+                                                image2d_t read_only in_U,
+                                                image2d_t write_only out_U) {
+  const int col = get_global_id(0) + pivot + 1;
+  const int row = get_global_id(1) + pivot + 1;
+  const int cols = get_image_width(in_U);
+  const int rows = get_image_height(in_U);
+
+  if (pivot == rows - 1)
+    return;
+
+  // TODO: alter this check, since now it can cause a deadlock
+  if (col >= cols || row >= rows)
+    return;
+
+  float pivot_val = read_imagef(in_U, s, (int2)(pivot, pivot)).s0;
+  float head_row_val = read_imagef(in_U, s, (int2)(pivot, row)).s0;
+  float mult = -head_row_val / pivot_val;
+
+  float pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot)).s0;
+  float old_val = read_imagef(in_U, s, (int2)(col, row)).s0;
+  float new_val = old_val + pivot_row_val * mult;
+  write_imagef(out_U, (int2)(col, row), (float4)(new_val, 0.0f, 0.0f, 1.0f));
+}
+
+kernel void gaussian_elimination_solve_texture(image2d_t read_only in_U,
+                                             image2d_t read_only odd_U,
+                                             global float *x,
+                                             local float *lmem) {
+  const int col = get_global_id(0);
+  const int cols = get_image_width(in_U);
+  const int rows = get_image_height(in_U);
+
+  for (int row = rows - 1; row >= 0; --row) {
+
+    if (col > row) {
+      float coefficient;
+      if (row & 1)
+        coefficient = read_imagef(odd_U, s, (int2)(col, row)).s0;
+      else
+        coefficient = read_imagef(in_U, s, (int2)(col, row)).s0;
+      lmem[col] = lmem[rows + col] * coefficient;
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    // The row-wi calculates the sum and writes the result (maybe O(log(n)?)
+    if (col == row) {
+      float coefficient;
+      float sum;
+      if (row & 1) {
+        coefficient = read_imagef(odd_U, s, (int2)(col, row)).s0;
+        sum = read_imagef(odd_U, s, (int2)(cols - 1, row)).s0;
+      } else {
+        coefficient = read_imagef(in_U, s, (int2)(col, row)).s0;
+        sum = read_imagef(in_U, s, (int2)(cols - 1, row)).s0;
+      }
+      for (int i = row + 1; i < rows; ++i)
+        sum -= lmem[i];
+      lmem[rows + col] = sum / coefficient;
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+  }
+
+  x[col] = lmem[rows + col];
+}
+
+kernel void gaussian_elimination_no_pivot_buffer(int rows, int cols, int pivot,
+                                               global double *in_U,
+                                               global double *out_U) {
+  const int col = get_global_id(0) + pivot + 1;
+  const int row = get_global_id(1) + pivot + 1;
+
+  if (pivot == rows - 1)
+    return;
+
+  // TODO: alter this check, since now it can cause a deadlock
+  if (col >= cols || row >= rows)
+    return;
+
+  double pivot_val = in_U[pivot * cols + pivot];
+  double head_row_val = in_U[row * cols + pivot];
+  double mult = -head_row_val / pivot_val;
+
+  double pivot_row_val = in_U[pivot * cols + col];
+  double old_val = in_U[row * cols + col];
+  double new_val = old_val + pivot_row_val * mult;
+  out_U[row * cols + col] = new_val;
+}
+
+kernel void gaussian_elimination_solve_buffer(int rows, int cols,
+                                            global double *even_U,
+                                            global double *odd_U,
+                                            global double *x,
+                                            local double *lmem) {
+  const int col = get_global_id(0);
+
+  for (int row = rows - 1; row >= 0; --row) {
+
+    if (col > row) {
+      float coefficient =
+          (row & 1) ? odd_U[row * cols + col] : even_U[row * cols + col];
+      lmem[col] = lmem[rows + col] * coefficient;
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    // The row-wi calculates the sum and writes the result (maybe O(log(n)?)
+    if (col == row) {
+      float coefficient =
+          (row & 1) ? odd_U[row * cols + col] : even_U[row * cols + col];
+      float sum = (row & 1) ? odd_U[row * cols + cols - 1]
+                            : even_U[row * cols + cols - 1];
+      for (int i = row + 1; i < rows; ++i)
+        sum -= lmem[i];
+      lmem[rows + col] = sum / coefficient;
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+  }
+
+  x[col] = lmem[rows + col];
+}
