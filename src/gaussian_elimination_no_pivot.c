@@ -76,7 +76,7 @@ double *Gaussian_elimination_no_pivot_gpu_lmem(double *A, double *b, size_t n, c
     err = clSetKernelArg(init_mat_k, 3, U_memsize + 2 * x_memsize, NULL);
     ocl_check(err, "set arg 3 for init_mat_k");
 
-    cl_event gaussian_evt, read_evt, unmap_evt;
+    cl_event gaussian_evt, read_evt;
 
     //Launch the kernel
     err = clEnqueueNDRangeKernel(status->que, init_mat_k,
@@ -91,6 +91,7 @@ double *Gaussian_elimination_no_pivot_gpu_lmem(double *A, double *b, size_t n, c
     ocl_check(err, "enqueue read buffer");
 
 #else
+    cl_event unmap_evt;
     //Map the buffer on the host so it can be read (a buffer read may be better to keep the result on the host)
     h_x = (double *)clEnqueueMapBuffer(status->que, d_x, CL_TRUE, CL_MAP_READ,
                                        0, x_memsize, 1,
@@ -177,7 +178,7 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
     size_t gws[] = {cols - 1, rows - 1};
     size_t lws[] = {16, 16};
 
-    cl_event upload_evt, gaussian_evt, solve_evt, read_evt, unmap_evt;
+    cl_event upload_evt, gaussian_evt, solve_evt, read_evt;
     cl_ulong gaussian_evt_rn = 0, solve_evt_rn = 0, read_evt_rn = 0;
 
     //Enqueue the events
@@ -214,8 +215,8 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
         clWaitForEvents(1, &gaussian_evt);
         gaussian_evt_rn += runtime_ns(gaussian_evt);
     }
-    gws[0] = rows;
-    lws[0] = rows;
+    gws[0] = round_mul_up(rows, 16);
+    lws[0] = round_mul_up(rows, 16);
 
     err = clSetKernelArg(solve_k, 0, sizeof(d_even_U), &d_even_U);
     ocl_check(err, "set arg 0 for solve_k");
@@ -240,6 +241,7 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
     //print_arr(h_x, n, 'x');
 #else
     //Map the buffer on the host so it can be read (a buffer read may be better to keep the result on the host)
+    cl_event unmap_evt;
     h_x = (float *)clEnqueueMapBuffer(status->que, d_x, CL_TRUE, CL_MAP_READ,
                                       0, x_memsize, 1,
                                       &gaussian_evt, &read_evt, &err);
@@ -313,7 +315,7 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
     size_t gws[] = {cols - 1, rows - 1};
     size_t lws[] = {16, 16};
 
-    cl_event gaussian_evt, solve_evt, read_evt, unmap_evt;
+    cl_event gaussian_evt, solve_evt, read_evt;
     cl_ulong gaussian_evt_rn = 0, solve_evt_rn = 0, read_evt_rn = 0;
 
     cl_mem d_in_U = d_even_U, d_out_U = d_odd_U;
@@ -349,8 +351,8 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
         clWaitForEvents(1, &gaussian_evt);
         gaussian_evt_rn += runtime_ns(gaussian_evt);
     }
-    gws[0] = rows;
-    lws[0] = rows;
+    gws[0] = round_mul_up(rows, 16);
+    lws[0] = round_mul_up(rows, 16);
 
     err = clSetKernelArg(solve_k, 0, sizeof(cl_int), &rows);
     ocl_check(err, "set arg 0 for solve_k");
@@ -379,6 +381,7 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
     //print_arr(h_x, n, 'x');
 #else
     //Map the buffer on the host so it can be read (a buffer read may be better to keep the result on the host)
+    cl_event unmap_evt;
     h_x = (double *)clEnqueueMapBuffer(status->que, d_x, CL_TRUE, CL_MAP_READ,
                                        0, x_memsize, 1,
                                        &gaussian_evt, &read_evt, &err);

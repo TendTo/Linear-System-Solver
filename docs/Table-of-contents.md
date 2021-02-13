@@ -1,6 +1,7 @@
 # Table of contents
 
-- **[Gaussian elimination](Gaussian-elimination.md)**
+- **[Gaussian elimination (no pivot)](Gaussian-elimination-no-pivot.md)**
+- **[Gaussian elimination (partial pivot)](Gaussian-elimination-pivot.md)**
 
 ---
 

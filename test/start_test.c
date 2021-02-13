@@ -18,6 +18,8 @@ void initialize_consts()
 
 int main(void)
 {
+    initialize_consts();
+
     Suite *(*suite_creators[NSUITE])(void) = {utility_suite, gaussian_elimination_no_pivot_suite, gaussian_elimination_pivot_suite, ocl_boiler_suite};
 
     int no_failed = 0;
