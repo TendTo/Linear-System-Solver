@@ -44,6 +44,14 @@ START_TEST(test_read_matrix_from_file)
 }
 END_TEST
 
+START_TEST(test_compare_arr)
+{
+    double a[] = {1.0, 2.0, 3.0, 4.0};
+    double b[] = {1.0, 2.0, 3.0, 4.0};
+    ck_assert(compare_arr(a, b, 4)); 
+}
+END_TEST
+
 Suite *utility_suite(void)
 {
     Suite *s;
@@ -56,6 +64,7 @@ Suite *utility_suite(void)
     tcase_add_test(tc_core, test_create_complete_matrix_lin_b_null);
     tcase_add_test(tc_core, test_swap);
     tcase_add_test(tc_core, test_read_matrix_from_file);
+    tcase_add_test(tc_core, test_compare_arr);
 
     suite_add_tcase(s, tc_core);
 

@@ -125,10 +125,10 @@ int compare_arr(double *a, const double *b, size_t n)
     for (size_t i = 0; i < n; ++i)
     {
         double difference = a[i] - b[i];
-        if (difference > PRECISION || difference < -PRECISION)
+        if (difference > PRECISION || difference < -PRECISION || isnan(difference))
         {
 #ifdef TEST
-            fprintf(stderr, "[ERROR] %f != %f\n", a[i], b[i]);
+            fprintf(stderr, "[ERROR] at pos %ld: %f != %f\n", i, a[i], b[i]);
 #endif
             return 0;
         }
