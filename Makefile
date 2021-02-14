@@ -3,11 +3,11 @@
 #==============================================================================
 
 # Variables for the make help printout
-PROJECT_NAME := SystemSolver
+PROJECT_NAME := LinearSystemSolver
 VERSION := v0.0.1
 
 # Binary names (not path, only file name)
-PRODUCTION_BINARY_NAME := SystemSolver
+PRODUCTION_BINARY_NAME := LinearSystemSolver
 TEST_SUITE_BINARY_NAME := TestSystemSolver
 
 # Entry file names (not path, only file name)
