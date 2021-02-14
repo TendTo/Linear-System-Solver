@@ -94,7 +94,10 @@ int main(int argc, char *const *argv)
         U_f = d_to_f_array(U, n * n + n);
         strcat(oclfile, "/gaussian_elimination_no_pivot.ocl");
         clCreateStatus(&status, oclfile);
-        x_f = Gaussian_elimination_no_pivot_gpu_texture(U_f, NULL, n, &status);
+        if ((n + 1) & 3)
+            x_f = Gaussian_elimination_no_pivot_gpu_texture(U_f, NULL, n, &status);
+        else
+            x_f = Gaussian_elimination_no_pivot_gpu_texture_4(U_f, NULL, n, &status);
         x = f_to_d_array(x_f, n);
         clFreeStatus(&status);
         break;
