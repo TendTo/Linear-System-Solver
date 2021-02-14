@@ -2,13 +2,13 @@
 
 int main(int argc, char *const *argv)
 {
-    int opt, seed = 123, n = 1000, impcode = 0;
+    int opt, seed = 123, n = 1000, impcode = 0, vectorize = 0;
     char infile[256], outfile[256], oclfile[512];
     infile[0] = '\0';
     outfile[0] = '\0';
 
     //Handle inputs
-    while ((opt = getopt(argc, argv, ":hi:o:s:d:")) != -1)
+    while ((opt = getopt(argc, argv, ":hvi:o:s:d:")) != -1)
     {
         switch (opt)
         {
@@ -39,6 +39,9 @@ int main(int argc, char *const *argv)
         case 'h':
             show_help_tooltip(argv[0]);
             exit(EXIT_SUCCESS);
+            break;
+        case 'v':
+            vectorize = 1;
             break;
         case '?':
             fprintf(stderr, "%s: Unexpected option: %c\n", argv[0], optopt);
@@ -94,7 +97,7 @@ int main(int argc, char *const *argv)
         U_f = d_to_f_array(U, n * n + n);
         strcat(oclfile, "/gaussian_elimination_no_pivot.ocl");
         clCreateStatus(&status, oclfile);
-        if ((n + 1) & 3)
+        if ((n + 1) & 3 || !vectorize)
             x_f = Gaussian_elimination_no_pivot_gpu_texture(U_f, NULL, n, &status);
         else
             x_f = Gaussian_elimination_no_pivot_gpu_texture_4(U_f, NULL, n, &status);
@@ -114,7 +117,10 @@ int main(int argc, char *const *argv)
         U_f = d_to_f_array(U, n * n + n);
         strcat(oclfile, "/gaussian_elimination_pivot.ocl");
         clCreateStatus(&status, oclfile);
-        x_f = Gaussian_elimination_pivot_gpu_texture(U_f, NULL, n, &status);
+        if ((n + 1) & 3 || !vectorize)
+            x_f = Gaussian_elimination_pivot_gpu_texture(U_f, NULL, n, &status);
+        else
+            x_f = Gaussian_elimination_pivot_gpu_texture_4(U_f, NULL, n, &status);
         x = f_to_d_array(x_f, n);
         clFreeStatus(&status);
         break;
@@ -156,10 +162,13 @@ void show_help_tooltip(const char *name)
              5: partial pivot cpu\n\
              6: partial pivot texture\n\
              7: partial pivot buffer\n");
-    printf("oclfname     -  path to the directory that contains the oclfiles\n");
+    printf("ocldname     -  path to the directory that contains the oclfiles\n");
     printf("-i infname   -  use the specified file to fetch the matrix.\n\
-             It must state the number of unknowns and then all the elements of the matrix, separated by spaces\n");
+             It must state all the elements of the complete matrix, separated by spaces\n");
     printf("-o outfname  -  use the specified file to print the result vector. Defauts to use standard output\n");
     printf("-s seed      -  seed used to generate the matrix if -f is not specified. Defaults to 123\n");
     printf("-d dim       -  number of unknowns of the generated the matrix if -f is not specified. Defaults to 1000\n");
+    printf("-v           -  enables vectorization, if the chosen implementation supports it.\n\
+             The number of unknowns must be 1 less than a multiple of 4\n");
+
 }

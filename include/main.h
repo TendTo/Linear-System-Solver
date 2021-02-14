@@ -18,7 +18,7 @@
 #include "gaussian_elimination_no_pivot.h"
 #include "utility.h"
 
-#define USAGE "Usage: %s [-i infname] [-o outfname] [-s seed] [-d dim] oclfname impcode\n"
+#define USAGE "Usage: %s [-i infname] [-o outfname] [-s seed] [-d dim] [-v] ocldname impcode\n"
 
 /**
  * Shows the help tooltip

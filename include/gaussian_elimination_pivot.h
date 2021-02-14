@@ -43,6 +43,19 @@ double *Gaussian_elimination_pivot(double *A, double *b, size_t n);
 float *Gaussian_elimination_pivot_gpu_texture(float *A, float *b, size_t n, cl_status *status);
 
 /**
+ * Applies the Gaussian elimination with no pivoting that exploits the OpenCL textures meant to take advantage of vectorization.
+ * Before appling the reductions, the best pivot is selected among the available ones if the same column
+ * 
+ * @param A Matrix of coefficients of the equations
+ * @param b Vector of know terms. If NULL, A will be assumed as a complete matrix of size (n X n + 1)
+ * @param n Number of unknowns
+ * @param status Pointer to a cl_status struct that represents the current status of the OpenCL runtime
+ * 
+ * @return Vector of length N containing the solutions to the system
+ */
+float *Gaussian_elimination_pivot_gpu_texture_4(float *A, float *b, size_t n, cl_status *status);
+
+/**
  * Applies the Gaussian elimination with partial pivoting that lanches n kernels with the same 2 buffers.
  * Before appling the reductions, the best pivot is selected among the available ones if the same column
  * 
