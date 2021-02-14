@@ -1,0 +1,201 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<svg
+ xmlns='http://www.w3.org/2000/svg'
+ xmlns:xlink="http://www.w3.org/1999/xlink"
+ viewBox='-290 -50 750 420'>
+ <title>Matrix</title>
+ <style>
+ * { fill:white ; stroke: black }
+ rect { stroke-width: 2; fill: inherit }
+ line { stroke-width: 8 }
+ text { fill: white; stroke: black; text-anchor: middle ; font-family: monospace ; font-size: 30px }
+ use.current-row{ fill: skyblue; }
+ use.pivot-row{ fill: red; }
+ use.pivot{ fill: green; }
+
+#frame1 {
+  visibility: hidden;
+  animation: 12s show infinite;
+}
+#frame2 {
+  visibility: hidden;
+  animation: 12s show infinite;
+  animation-delay: 2s;
+}
+#frame3 {
+  visibility: hidden;
+  animation: 12s show infinite;
+  animation-delay: 4s;
+}
+#frame4 {
+  visibility: hidden;
+  animation: 12s show infinite;
+  animation-delay: 6s;
+}
+#frame5 {
+  visibility: hidden;
+  animation: 12s show infinite;
+  animation-delay: 8s;
+}
+#frame6 {
+  visibility: hidden;
+  animation: 12s show infinite;
+  animation-delay: 10s;
+}
+
+@keyframes show {
+  0%   { visibility: visible;}
+  16.6%  { visibility: visible; }
+  16.7%  { visibility: hidden; }
+  100% { visibility: hidden; }
+}
+</style>
+ <defs>
+  <rect id='n' width='100' height='100' x='-50' y='-50'/>
+  <rect id='l' width='20' height='20' x='-10' y='-10'/>
+ </defs>
+
+<g id='frame1'>
+ <use class="current-row" xlink:href='#n' x='0' y='0'/>
+ <use class="" xlink:href='#n' x='100' y='0'/>
+ <use class="" xlink:href='#n' x='200' y='0'/>
+ <use class="" xlink:href='#n' x='300' y='0'/>
+ <use class="" xlink:href='#n' x='400' y='0'/>
+ <use class="current-row" xlink:href='#n' x='0' y='100'/>
+ <use class="" xlink:href='#n' x='100' y='100'/>
+ <use class="" xlink:href='#n' x='200' y='100'/>
+ <use class="" xlink:href='#n' x='300' y='100'/>
+ <use class="" xlink:href='#n' x='400' y='100'/>
+ <use class="current-row" xlink:href='#n' x='0' y='200'/>
+ <use class="" xlink:href='#n' x='100' y='200'/>
+ <use class="" xlink:href='#n' x='200' y='200'/>
+ <use class="" xlink:href='#n' x='300' y='200'/>
+ <use class="" xlink:href='#n' x='400' y='200'/>
+ <use class="current-row" xlink:href='#n' x='0' y='300'/>
+ <use class="" xlink:href='#n' x='100' y='300'/>
+ <use class="" xlink:href='#n' x='200' y='300'/>
+ <use class="" xlink:href='#n' x='300' y='300'/>
+ <use class="" xlink:href='#n' x='400' y='300'/>
+</g>
+<g id='frame2'>
+ <use class="" xlink:href='#n' x='0' y='0'/>
+ <use class="current-row" xlink:href='#n' x='100' y='0'/>
+ <use class="current-row" xlink:href='#n' x='200' y='0'/>
+ <use class="current-row" xlink:href='#n' x='300' y='0'/>
+ <use class="current-row" xlink:href='#n' x='400' y='0'/>
+ <use class="" xlink:href='#n' x='0' y='100'/>
+ <use class="current-row" xlink:href='#n' x='100' y='100'/>
+ <use class="current-row" xlink:href='#n' x='200' y='100'/>
+ <use class="current-row" xlink:href='#n' x='300' y='100'/>
+ <use class="current-row" xlink:href='#n' x='400' y='100'/>
+ <use class="pivot" xlink:href='#n' x='0' y='200'/>
+ <use class="pivot-row" xlink:href='#n' x='100' y='200'/>
+ <use class="pivot-row" xlink:href='#n' x='200' y='200'/>
+ <use class="pivot-row" xlink:href='#n' x='300' y='200'/>
+ <use class="pivot-row" xlink:href='#n' x='400' y='200'/>
+ <use class="" xlink:href='#n' x='0' y='300'/>
+ <use class="current-row" xlink:href='#n' x='100' y='300'/>
+ <use class="current-row" xlink:href='#n' x='200' y='300'/>
+ <use class="current-row" xlink:href='#n' x='300' y='300'/>
+ <use class="current-row" xlink:href='#n' x='400' y='300'/>
+</g>
+<g id='frame3'>
+ <use class="" xlink:href='#n' x='0' y='0'/>
+ <use class="" xlink:href='#n' x='100' y='0'/>
+ <use class="" xlink:href='#n' x='200' y='0'/>
+ <use class="" xlink:href='#n' x='300' y='0'/>
+ <use class="" xlink:href='#n' x='400' y='0'/>
+ <use class="" xlink:href='#n' x='0' y='100'/>
+ <use class="current-row" xlink:href='#n' x='100' y='100'/>
+ <use class="" xlink:href='#n' x='200' y='100'/>
+ <use class="" xlink:href='#n' x='300' y='100'/>
+ <use class="" xlink:href='#n' x='400' y='100'/>
+ <use class="" xlink:href='#n' x='0' y='200'/>
+ <use class="current-row" xlink:href='#n' x='100' y='200'/>
+ <use class="" xlink:href='#n' x='200' y='200'/>
+ <use class="" xlink:href='#n' x='300' y='200'/>
+ <use class="" xlink:href='#n' x='400' y='200'/>
+ <use class="" xlink:href='#n' x='0' y='300'/>
+ <use class="current-row" xlink:href='#n' x='100' y='300'/>
+ <use class="" xlink:href='#n' x='200' y='300'/>
+ <use class="" xlink:href='#n' x='300' y='300'/>
+ <use class="" xlink:href='#n' x='400' y='300'/>
+</g>
+<g id='frame4'>
+ <use class="" xlink:href='#n' x='0' y='0'/>
+ <use class="" xlink:href='#n' x='100' y='0'/>
+ <use class="" xlink:href='#n' x='200' y='0'/>
+ <use class="" xlink:href='#n' x='300' y='0'/>
+ <use class="" xlink:href='#n' x='400' y='0'/>
+ <use class="" xlink:href='#n' x='0' y='100'/>
+ <use class="pivot" xlink:href='#n' x='100' y='100'/>
+ <use class="pivot-row" xlink:href='#n' x='200' y='100'/>
+ <use class="pivot-row" xlink:href='#n' x='300' y='100'/>
+ <use class="pivot-row" xlink:href='#n' x='400' y='100'/>
+ <use class="" xlink:href='#n' x='0' y='200'/>
+ <use class="" xlink:href='#n' x='100' y='200'/>
+ <use class="current-row" xlink:href='#n' x='200' y='200'/>
+ <use class="current-row" xlink:href='#n' x='300' y='200'/>
+ <use class="current-row" xlink:href='#n' x='400' y='200'/>
+ <use class="" xlink:href='#n' x='0' y='300'/>
+ <use class="" xlink:href='#n' x='100' y='300'/>
+ <use class="current-row" xlink:href='#n' x='200' y='300'/>
+ <use class="current-row" xlink:href='#n' x='300' y='300'/>
+ <use class="current-row" xlink:href='#n' x='400' y='300'/>
+</g>
+<g id='frame5'>
+ <use class="" xlink:href='#n' x='0' y='0'/>
+ <use class="" xlink:href='#n' x='100' y='0'/>
+ <use class="" xlink:href='#n' x='200' y='0'/>
+ <use class="" xlink:href='#n' x='300' y='0'/>
+ <use class="" xlink:href='#n' x='400' y='0'/>
+ <use class="" xlink:href='#n' x='0' y='100'/>
+ <use class="" xlink:href='#n' x='100' y='100'/>
+ <use class="" xlink:href='#n' x='200' y='100'/>
+ <use class="" xlink:href='#n' x='300' y='100'/>
+ <use class="" xlink:href='#n' x='400' y='100'/>
+ <use class="" xlink:href='#n' x='0' y='200'/>
+ <use class="" xlink:href='#n' x='100' y='200'/>
+ <use class="current-row" xlink:href='#n' x='200' y='200'/>
+ <use class="" xlink:href='#n' x='300' y='200'/>
+ <use class="" xlink:href='#n' x='400' y='200'/>
+ <use class="" xlink:href='#n' x='0' y='300'/>
+ <use class="" xlink:href='#n' x='100' y='300'/>
+ <use class="current-row" xlink:href='#n' x='200' y='300'/>
+ <use class="" xlink:href='#n' x='300' y='300'/>
+ <use class="" xlink:href='#n' x='400' y='300'/>
+</g>
+<g id='frame6'>
+ <use class="" xlink:href='#n' x='0' y='0'/>
+ <use class="" xlink:href='#n' x='100' y='0'/>
+ <use class="" xlink:href='#n' x='200' y='0'/>
+ <use class="" xlink:href='#n' x='300' y='0'/>
+ <use class="" xlink:href='#n' x='400' y='0'/>
+ <use class="" xlink:href='#n' x='0' y='100'/>
+ <use class="" xlink:href='#n' x='100' y='100'/>
+ <use class="" xlink:href='#n' x='200' y='100'/>
+ <use class="" xlink:href='#n' x='300' y='100'/>
+ <use class="" xlink:href='#n' x='400' y='100'/>
+ <use class="" xlink:href='#n' x='0' y='200'/>
+ <use class="" xlink:href='#n' x='100' y='200'/>
+ <use class="" xlink:href='#n' x='200' y='200'/>
+ <use class="current-row" xlink:href='#n' x='300' y='200'/>
+ <use class="current-row" xlink:href='#n' x='400' y='200'/>
+ <use class="" xlink:href='#n' x='0' y='300'/>
+ <use class="" xlink:href='#n' x='100' y='300'/>
+ <use class="pivot" xlink:href='#n' x='200' y='300'/>
+ <use class="pivot-row" xlink:href='#n' x='300' y='300'/>
+ <use class="pivot-row" xlink:href='#n' x='400' y='300'/>
+</g>
+
+
+ <text x='-223' y='150'>rows: n</text>
+ <text x='-190' y='180'>cols: (n+1)</text>
+ <text x='-230' y='210'>pivot:</text>
+ <use class="pivot" xlink:href='#l' x='-160' y='203'/>
+ <text x='-197' y='240'>pivot row:</text>
+ <use class="pivot-row" xlink:href='#l' x='-95' y='233'/>
+ <text x='-196' y='270'>work-item:</text>
+ <use class="current-row" xlink:href='#l' x='-95' y='263'/>
+
+</svg>

@@ -41,7 +41,7 @@ double *Gaussian_elimination_no_pivot_gpu_lmem(double *A, double *b, size_t n, c
 {
     if (!status)
     {
-        fprintf(stderr, "[error] null status");
+        fprintf(stderr, "[ERROR] null status");
         return NULL;
     }
     cl_int rows = n, cols = n + 1, err;
@@ -132,7 +132,7 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
 {
     if (!status)
     {
-        fprintf(stderr, "[error] null status");
+        fprintf(stderr, "[ERROR] null status");
         return NULL;
     }
     cl_int rows = n, cols = n + 1, gaussian_wi = 0, err;
@@ -146,9 +146,8 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
         h_U = A;
 
     // Texture settings
-    cl_image_format tex_fmt = {
-        .image_channel_order = CL_R,
-        .image_channel_data_type = CL_FLOAT};
+    cl_image_format tex_fmt = {.image_channel_order = CL_R,
+                               .image_channel_data_type = CL_FLOAT};
     cl_image_desc tex_desc;
     memset(&tex_desc, 0, sizeof(tex_desc));
     tex_desc.image_type = CL_MEM_OBJECT_IMAGE2D;
@@ -284,7 +283,7 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
 {
     if (!status)
     {
-        fprintf(stderr, "[error] null status");
+        fprintf(stderr, "[ERROR] null status");
         return NULL;
     }
     cl_int rows = n, cols = n + 1, gaussian_wi = 0, err;

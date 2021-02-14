@@ -1,4 +1,4 @@
-# Gaussian elimination (no pivot)
+# Gaussian elimination (partial pivot)
 
 ## Complete explanation
 [Wikipedia](https://en.wikipedia.org/wiki/Gaussian_elimination)
@@ -18,7 +18,10 @@ Once in this form, the system can be solved easily with some substitutions.
 
 ## OpenCL implementations
 
-There are 2 main parts that represent a challenge in the OpenCL implementation:
+There are 3 main parts that represent a challenge in the OpenCL implementation:
+
+- choosing as a pivot the row with the greater absolute value in the column of index **pivot**, and if it is not the row of index **pivot** swap them.
+    - This translates in an search problem that is not embarrassingly parallel, followed by a the possible swap of two rows that must be synchronized for all work-items for the following steps to work properly.
 
 - each time a new pivot of index **i** has been chosen, the following **n - i - 1** reductions depend on the previous step of the algorithm.
     - To make it clearer, let's say we have to solve a system of **n** unknowns in **n** equations.  
@@ -31,43 +34,21 @@ There are 2 main parts that represent a challenge in the OpenCL implementation:
     - This is because, since the result of the algorithm is an upper triangular matrix, only the last unknown can be obtained directly, while the others depend on the previous ones.
     - On the flip-side, the action of summing all the previous solution, multiplied with the correct coefficient, can be achieved in O(log(n)) time instead of the usual O(n) by taking advantage of some parallelization.
 
-### **No pivot lmem**
+### **Partial pivot texture**
 
-Simplest implementation of a Gaussian elimination where the pivots are chosen in based on the order of rows.  
-The whole matrix is stored in the local memory of size (**n + 2** X **n + 1**) and all the work-items belong to the same work-group, so that they share the same local memory.
+In this implementation of the Gaussian elimination the pivot row is the one that contains the greater absolute value in the pivot column.  
+If the newly found pivot row is not the one the first row of the sub-matrix, the two rows are swapped.
 
-The parallelization only concerns the fact that the work-items go through each row in parallel, each on a specific column.
-
-Finally, for each row the corresponding unknown's value is calculate, storing the temporary calculations in one row, while the **n** solutions are stored in the other.
-
-<p align="center">
-<img src="svg/GPU-no-pivot-lmem.svg" alt="No pivot lmem" width="40%"/>
-</p>
-
-**Number of kernels launched: O(1)**  
-**Local memory used: O(n^2)**  
-**Time complexity: O(n^2)**  
-**Spatial complexity: O(n^2)**  
-
-| :heavy_check_mark: Pro | :x: Cons |
-| - | - |
-| The parallelization improves the time complexity | Then dimension of the matrix is limited by the amount of local memory available to the work-group |
-| | The "no pivot" version may not be able to solve some solvable systems |
-| | All the work-items must belong to the same work-group |
-
-**Conclusion:** this approach is practically useless, since the limitation of having the whole matrix stored in local memory negates the biggest benefits of using a parallel implementations, which manifest on very large sets of data.
-
-### **No pivot texture**
-
-Simplest implementation of a Gaussian elimination where the pivots are chosen in based on the order of rows.  
 The whole matrix is stored in a texture. Another one with the same dimensions is created. The two textures are used alternately as input or output, a ping pong of sorts, meaning there is the need to lauch **n - 1** kernels.  
-The result is that the odd reduced rows will be on one texture, while the even ones will be on the other.
+The result is that the odd reduced rows will be on one texture, while the even ones will be on the other, exept for the last row, that will be in the opposite texture.
 
-The parallelization concerns the fact that each work-item will calculate one item of the sub-matrix.  
-_Each frame is a different kernel_
+The parallelization concerns the fact that the max value and its index are calculated in a logaritmic time and each work-item will calculate one item of the sub-matrix.
+
+_In the output texture the pivot row is written as the first available row, effectively swapping them if it was not the first_  
+_Every other frame is a different kernel_
 
 <p align="center">
-<img src="svg/GPU-no-pivot-tex.svg" alt="No pivot tex" width="40%"/>
+<img src="svg/GPU-pivot-tex.svg" alt="Partial pivot tex" width="40%"/>
 </p>
 
 To calculate the result vector, a buffer of size 2n is allocated in the local memory.  
@@ -85,22 +66,25 @@ For each row, the corresponding unknown's value is calculate, storing the tempor
 | :heavy_check_mark: Pro | :x: Cons |
 | - | - |
 | The parallelization improves the time complexity | Needs to launch n kernels, with all the overhead this entails |
-| Can exploit the strong caching enjoyed by the textures | The "no pivot" version may not be able to solve some solvable systems |
-| | The use of a texture allows only floats to be used, excluding doubles |
+| Can exploit the strong caching enjoyed by the textures | The use of a texture allows only floats to be used, excluding doubles |
 
-**Conclusion:** this approach is the fastest one for big inputs, with the limitation of being "no pivot" and working only on floats.
+**Conclusion:** this approach is bery fast for big inputs and has the benefits of using pivoting, with the only limitation of working only on floats.
 
-### **No pivot buffer**
+### **Partial pivot buffer**
 
-Simplest implementation of a Gaussian elimination where the pivots are chosen in based on the order of rows.  
+In this implementation of the Gaussian elimination the pivot row is the one that contains the greater absolute value in the pivot column.  
+If the newly found pivot row is not the one the first row of the sub-matrix, the two rows are swapped.
+
 The whole matrix is stored in a buffer. Another one with the same dimensions is created. The two buffers are used alternately as input or output, a ping pong of sorts, meaning there is the need to lauch **n - 1** kernels.  
 The result is that the odd reduced rows will be on one buffer, while the even ones will be on the other.
 
 The parallelization concerns the fact that each work-item will calculate one item of the sub-matrix.  
-_Each frame is a different kernel_
+
+_In the output buffer the pivot row is written as the first available row, effectively swapping them if it was not the first_  
+_Every other frame is a different kernel_
 
 <p align="center">
-<img src="svg/GPU-no-pivot-buffer.svg" alt="No pivot buffer" width="40%"/>
+<img src="svg/GPU-pivot-buffer.svg" alt="Partial pivot buffer" width="40%"/>
 </p>
 
 To calculate the result vector, a buffer of size 2n is allocated in the local memory.  
@@ -118,9 +102,9 @@ For each row, the corresponding unknown's value is calculate, storing the tempor
 | :heavy_check_mark: Pro | :x: Cons |
 | - | - |
 | The parallelization improves the time complexity | Needs to launch n kernels, with all the overhead this entails |
-| | The "no pivot" version may not be able to solve some solvable systems |
+| The solution, when found, is as exact as it can get | |
 
-**Conclusion:** this approach is not the fastest, but being based on a buffer leaves more room for the customization of the type of input, with the only limitation of being "no pivot".
+**Conclusion:** this approach is not the fastest, but being based on a buffer leaves more room for the customization of the type of input and is the most "general purpose".
 
 ---
 
