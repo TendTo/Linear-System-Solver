@@ -37,6 +37,26 @@ float *d_to_f_array(double *a, size_t n);
 double *f_to_d_array(float *a, size_t n);
 
 /**
+ * Generates a complete matrix from a random sequence of numbers
+ * 
+ * @param seed Seed used to generate the sequence of numbers
+ * @param n Number of unknowns
+ * 
+ * @return Complete matrix of size (n X n + 1)
+ */
+double *generate_complete_matrix(int seed, int n);
+
+/**
+ * Generates a complete matrix of floats from a random sequence of numbers
+ * 
+ * @param seed Seed used to generate the sequence of numbers
+ * @param n Number of unknowns
+ * 
+ * @return Complete matrix of size (n X n + 1)
+ */
+float *generate_complete_matrix_f(int seed, int n);
+
+/**
  * Copies the given linear matrix A to a newly created linear matrix.
  * If a b vector is given, it is assimilated as a new column of the new matrix, wich will be (n X n + 1)
  * 
@@ -125,6 +145,25 @@ void swap(double *a, double *b);
  * @return Complete matrix written in the file
  */
 double *read_matrix_from_file(const char *fname);
+
+/**
+ * Reads the values in a file and produces the corrisponding complete matrix of dimension n
+ * 
+ * @param fname Name of the file
+ * @param n Number of unknowns
+ * 
+ * @return Complete matrix written in the file
+ */
+double *read_matrix_n_from_file(const char *fname, int n);
+
+/**
+ * Reads the values in a file and produces the corrisponding complete matrix of floats
+ * 
+ * @param fname Name of the file
+ * 
+ * @return Complete matrix written in the file
+ */
+float *read_matrix_from_file_f(const char *fname);
 
 /**
  * Checks if a function call caused an error based on its return valus
