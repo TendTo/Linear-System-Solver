@@ -62,9 +62,9 @@ int main(int argc, char *const *argv)
     strncpy(oclfile, argv[optind], 255);
     oclfile[255] = '\0';
     impcode = atoi(argv[optind + 1]);
-    if (impcode < 0)
+    if (impcode < 0 || impcode > 7)
     {
-        fprintf(stderr, "%s: impcode value must be greater than 0\n", argv[0]);
+        fprintf(stderr, "%s: impcode value must be between 1 and 7\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
