@@ -37,7 +37,7 @@ cl_platform_id select_platform()
 
 	if (nump >= nplats)
 	{
-		fprintf(stderr, "no platform number %u", nump);
+		fprintf(stderr, "no platform number %u\n", nump);
 		exit(1);
 	}
 
@@ -77,7 +77,7 @@ cl_device_id select_device(cl_platform_id p)
 
 	if (numd >= ndevs)
 	{
-		fprintf(stderr, "no device number %u", numd);
+		fprintf(stderr, "no device number %u\n", numd);
 		exit(1);
 	}
 
