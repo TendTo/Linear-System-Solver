@@ -6,6 +6,7 @@ double *Gaussian_elimination_pivot(double *A, double *b, size_t n)
     double *U = create_complete_matrix_lin(A, b, n);
     double *x = (double *)malloc(sizeof(double) * n);
     memset(x, 0, sizeof(double) * n);
+    clock_t start = clock();
 
     for (size_t i = 0; i < n - 1; ++i)
     {
@@ -54,6 +55,12 @@ double *Gaussian_elimination_pivot(double *A, double *b, size_t n)
 
         x[row] = sum / U[row * n_complete + row];
     }
+    clock_t end = clock();
+    printf("-----\n");
+    printf("CPU pivot | n: %ld\n", n);
+    printf("Gaussian_evt:\truntime %.0f ns\n",
+     (double)(end - start) / CLOCKS_PER_SEC * 1.0e9);
+    printf("-----\n");
     //print_mat_lin(U, n, n_complete, 'U');
     free(U);
     return x;
@@ -66,7 +73,8 @@ float *Gaussian_elimination_pivot_gpu_texture(float *A, float *b, size_t n, cl_s
         fprintf(stderr, "[ERROR] null status");
         return NULL;
     }
-    cl_int rows = n, cols = n + 1, gaussian_wi = 0, err;
+    cl_int rows = n, cols = n + 1, err;
+    uint gaussian_wi = 0;
     size_t U_memsize = sizeof(cl_float) * rows * cols;
     size_t x_memsize = sizeof(cl_float) * rows;
 
@@ -149,8 +157,8 @@ float *Gaussian_elimination_pivot_gpu_texture(float *A, float *b, size_t n, cl_s
         clWaitForEvents(1, &gaussian_evt);
         gaussian_evt_rn += runtime_ns(gaussian_evt);
     }
-    gws[0] = round_mul_up(rows, 16);
-    lws[0] = round_mul_up(rows, 16);
+    lws[0] = rows < 64 ? rows : rows / 4;
+    gws[0] = round_mul_up(rows, lws[0]);
 
     err = clSetKernelArg(solve_k, 0, sizeof(d_even_U), &d_even_U);
     ocl_check(err, "set arg 0 for solve_k");
@@ -227,7 +235,8 @@ float *Gaussian_elimination_pivot_gpu_texture_vec(float *A, float *b, size_t n, 
         fprintf(stderr, "[ERROR] not divisible by 4");
         return NULL;
     }
-    cl_int rows = n, cols = (n + 1) / 4, gaussian_wi = 0, err;
+    cl_int rows = n, cols = (n + 1) / 4, err;
+    uint gaussian_wi = 0;
     size_t U_memsize = sizeof(cl_float) * rows * cols * 4;
     size_t x_memsize = sizeof(cl_float) * rows;
 
@@ -310,8 +319,8 @@ float *Gaussian_elimination_pivot_gpu_texture_vec(float *A, float *b, size_t n, 
         clWaitForEvents(1, &gaussian_evt);
         gaussian_evt_rn += runtime_ns(gaussian_evt);
     }
-    gws[0] = round_mul_up(rows, 16);
-    lws[0] = round_mul_up(rows, 16);
+    lws[0] = rows < 64 ? rows : rows / 4;
+    gws[0] = round_mul_up(rows, lws[0]);
 
     err = clSetKernelArg(solve_k, 0, sizeof(d_even_U), &d_even_U);
     ocl_check(err, "set arg 0 for solve_k");
@@ -382,7 +391,8 @@ double *Gaussian_elimination_pivot_gpu_buffer(double *A, double *b, size_t n, cl
         fprintf(stderr, "[ERROR] null status");
         return NULL;
     }
-    cl_int rows = n, cols = n + 1, gaussian_wi = 0, err;
+    cl_int rows = n, cols = n + 1, err;
+    uint gaussian_wi = 0;
     size_t U_memsize = sizeof(cl_double) * rows * cols;
     size_t x_memsize = sizeof(cl_double) * rows;
 
@@ -450,8 +460,8 @@ double *Gaussian_elimination_pivot_gpu_buffer(double *A, double *b, size_t n, cl
         clWaitForEvents(1, &gaussian_evt);
         gaussian_evt_rn += runtime_ns(gaussian_evt);
     }
-    gws[0] = round_mul_up(rows, 16);
-    lws[0] = round_mul_up(rows, 16);
+    lws[0] = rows < 64 ? rows : rows / 4;
+    gws[0] = round_mul_up(rows, lws[0]);
 
     err = clSetKernelArg(solve_k, 0, sizeof(cl_int), &rows);
     ocl_check(err, "set arg 0 for solve_k");
