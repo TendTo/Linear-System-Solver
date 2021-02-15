@@ -2,6 +2,7 @@
 
 - **[Gaussian elimination (no pivot)](Gaussian-elimination-no-pivot.md)**
 - **[Gaussian elimination (partial pivot)](Gaussian-elimination-pivot.md)**
+- **[Benchmarks](Benchmarks.md)**
 
 ---
 
