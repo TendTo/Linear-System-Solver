@@ -122,14 +122,14 @@ START_TEST(test_Gaussian_elimination_pivot_gpu_texture_1000)
 }
 END_TEST
 
-START_TEST(test_Gaussian_elimination_pivot_gpu_texture_4_3)
+START_TEST(test_Gaussian_elimination_pivot_gpu_texture_vec_3)
 {
     const int n = 3;
     float *x;
     float U[] = {1.0f, 3.0f, -4.0f, 1.0f, 3.0f, 1.0f, 2.0f, -7.0f, 0.0f, -2.0f, 3.0f, 1.0f};
     cl_status status;
     clCreateStatus(&status, "src/ocl/gaussian_elimination_pivot.ocl");
-    x = Gaussian_elimination_pivot_gpu_texture_4(U, NULL, n, &status);
+    x = Gaussian_elimination_pivot_gpu_texture_vec(U, NULL, n, &status);
     printf("fest\n");
     double *new_x = f_to_d_array(x, n);
     ck_assert(compare_arr(new_x, expected_3_int, n));
@@ -208,7 +208,7 @@ Suite *gaussian_elimination_pivot_suite(void)
     tcase_add_test(tc_core, test_Gaussian_elimination_pivot_gpu_texture_5);
     tcase_add_test(tc_core, test_Gaussian_elimination_pivot_gpu_texture_10);
     tcase_add_test(tc_core, test_Gaussian_elimination_pivot_gpu_texture_1000);
-    tcase_add_test(tc_core, test_Gaussian_elimination_pivot_gpu_texture_4_3);
+    tcase_add_test(tc_core, test_Gaussian_elimination_pivot_gpu_texture_vec_3);
     tcase_add_test(tc_core, test_Gaussian_elimination_pivot_gpu_buffer_3);
     tcase_add_test(tc_core, test_Gaussian_elimination_pivot_gpu_buffer_5);
     tcase_add_test(tc_core, test_Gaussian_elimination_pivot_gpu_buffer_10);

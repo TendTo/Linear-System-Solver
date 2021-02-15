@@ -100,7 +100,7 @@ int main(int argc, char *const *argv)
         if ((n + 1) & 3 || !vectorize)
             x_f = Gaussian_elimination_no_pivot_gpu_texture(U_f, NULL, n, &status);
         else
-            x_f = Gaussian_elimination_no_pivot_gpu_texture_4(U_f, NULL, n, &status);
+            x_f = Gaussian_elimination_no_pivot_gpu_texture_vec(U_f, NULL, n, &status);
         x = f_to_d_array(x_f, n);
         clFreeStatus(&status);
         break;
@@ -120,7 +120,7 @@ int main(int argc, char *const *argv)
         if ((n + 1) & 3 || !vectorize)
             x_f = Gaussian_elimination_pivot_gpu_texture(U_f, NULL, n, &status);
         else
-            x_f = Gaussian_elimination_pivot_gpu_texture_4(U_f, NULL, n, &status);
+            x_f = Gaussian_elimination_pivot_gpu_texture_vec(U_f, NULL, n, &status);
         x = f_to_d_array(x_f, n);
         clFreeStatus(&status);
         break;

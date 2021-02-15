@@ -53,7 +53,7 @@ float *Gaussian_elimination_pivot_gpu_texture(float *A, float *b, size_t n, cl_s
  * 
  * @return Vector of length N containing the solutions to the system
  */
-float *Gaussian_elimination_pivot_gpu_texture_4(float *A, float *b, size_t n, cl_status *status);
+float *Gaussian_elimination_pivot_gpu_texture_vec(float *A, float *b, size_t n, cl_status *status);
 
 /**
  * Applies the Gaussian elimination with partial pivoting that lanches n kernels with the same 2 buffers.

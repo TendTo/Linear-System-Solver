@@ -164,7 +164,7 @@ kernel void gaussian_elimination_solve_texture(image2d_t read_only even_U, image
   x[col] = lmem[rows + col];
 }
 
-kernel void gaussian_elimination_no_pivot_texture_4(int pivot, image2d_t read_only in_U, image2d_t write_only out_U) {
+kernel void gaussian_elimination_no_pivot_texture_vec(int pivot, image2d_t read_only in_U, image2d_t write_only out_U) {
 
   const int pivot_quarts = pivot / 4;
   const int col = get_global_id(0) + pivot / 4;
@@ -208,7 +208,7 @@ kernel void gaussian_elimination_no_pivot_texture_4(int pivot, image2d_t read_on
   write_imagef(out_U, (int2)(col, row), new_val);
 }
 
-kernel void gaussian_elimination_solve_texture_4(image2d_t read_only even_U, image2d_t read_only odd_U,
+kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, image2d_t read_only odd_U,
                                                  global float *restrict x, local float *restrict lmem) {
   const int col = get_global_id(0);
   const int cols = get_image_width(even_U);

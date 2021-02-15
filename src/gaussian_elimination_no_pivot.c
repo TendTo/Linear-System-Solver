@@ -278,7 +278,7 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
     return h_x;
 }
 
-float *Gaussian_elimination_no_pivot_gpu_texture_4(float *A, float *b, size_t n, cl_status *status)
+float *Gaussian_elimination_no_pivot_gpu_texture_vec(float *A, float *b, size_t n, cl_status *status)
 {
     if (!status)
     {
@@ -323,9 +323,9 @@ float *Gaussian_elimination_no_pivot_gpu_texture_4(float *A, float *b, size_t n,
     ocl_check(err, "create output buffer");
 
     //Create kernel
-    cl_kernel gaussian_k = clCreateKernel(status->prog, "gaussian_elimination_no_pivot_texture_4", &err);
+    cl_kernel gaussian_k = clCreateKernel(status->prog, "gaussian_elimination_no_pivot_texture_vec", &err);
     ocl_check(err, "create gaussian_elimination_no_pivot_texture kernel");
-    cl_kernel solve_k = clCreateKernel(status->prog, "gaussian_elimination_solve_texture_4", &err);
+    cl_kernel solve_k = clCreateKernel(status->prog, "gaussian_elimination_solve_texture_vec", &err);
     ocl_check(err, "create gaussian_elimination_no_pivot_texture kernel");
 
     //Kernel settings

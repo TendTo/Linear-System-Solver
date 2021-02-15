@@ -215,7 +215,7 @@ float *Gaussian_elimination_pivot_gpu_texture(float *A, float *b, size_t n, cl_s
     return h_x;
 }
 
-float *Gaussian_elimination_pivot_gpu_texture_4(float *A, float *b, size_t n, cl_status *status)
+float *Gaussian_elimination_pivot_gpu_texture_vec(float *A, float *b, size_t n, cl_status *status)
 {
     if (!status)
     {
@@ -260,9 +260,9 @@ float *Gaussian_elimination_pivot_gpu_texture_4(float *A, float *b, size_t n, cl
     ocl_check(err, "create output buffer");
 
     //Create kernel
-    cl_kernel gaussian_k = clCreateKernel(status->prog, "gaussian_elimination_pivot_texture_4", &err);
+    cl_kernel gaussian_k = clCreateKernel(status->prog, "gaussian_elimination_pivot_texture_vec", &err);
     ocl_check(err, "create gaussian_elimination_no_pivot_texture kernel");
-    cl_kernel solve_k = clCreateKernel(status->prog, "gaussian_elimination_solve_texture_4", &err);
+    cl_kernel solve_k = clCreateKernel(status->prog, "gaussian_elimination_solve_texture_vec", &err);
     ocl_check(err, "create gaussian_elimination_no_pivot_texture kernel");
 
     //Kernel settings
@@ -333,7 +333,6 @@ float *Gaussian_elimination_pivot_gpu_texture_4(float *A, float *b, size_t n, cl
                               1, &solve_evt, &read_evt);
     ocl_check(err, "enqueue read buffer");
 
-    printf("h_x[0]: %.2f\n", h_x[0]);
     //print_arr(h_x, n, 'x');
 #else
     //Map the buffer on the host so it can be read (a buffer read may be better to keep the result on the host)
