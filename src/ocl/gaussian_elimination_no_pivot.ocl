@@ -204,10 +204,6 @@ kernel void gaussian_elimination_no_pivot_texture_vec(int pivot, image2d_t read_
     pivot_val = pivot_val4.s3;
     head_row_val = head_row_val4.s3;
     break;
-  default:
-    pivot_val = 0.0f;
-    head_row_val = 0.0f;
-    break;
   }
   float mult = -head_row_val / pivot_val;
 
@@ -247,9 +243,6 @@ kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, i
           break;
         case 3:
           coefficient = coefficient4.s3;
-          break;
-        default:
-          coefficient = 0.0f;
           break;
         }
         lmem[col] = lmem[rows + col] * coefficient;
@@ -295,9 +288,6 @@ kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, i
         case 3:
           coefficient = coefficient4.s3;
           break;
-        default:
-          coefficient = 1.0f;
-          break;
         }
         sum -= lmem[row + 1];
         lmem[rows + col] = sum / coefficient;
@@ -324,6 +314,44 @@ kernel void gaussian_elimination_no_pivot_buffer(int rows, int cols, int pivot, 
   double pivot_row_val = in_U[pivot * cols + col];
   double old_val = in_U[row * cols + col];
   double new_val = old_val + pivot_row_val * mult;
+  out_U[row * cols + col] = new_val;
+}
+
+kernel void gaussian_elimination_no_pivot_buffer_vec(int rows, int cols, int pivot, global double4 *restrict in_U,
+                                                     global double4 *restrict out_U) {
+  const int pivot_quarts = pivot / 4;
+  const int col = get_global_id(0) + pivot / 4;
+  const int row = get_global_id(1) + pivot + 1;
+
+  if (col >= cols || row >= rows)
+    return;
+
+  double4 pivot_val4 = in_U[pivot * cols + pivot_quarts];
+  double4 head_row_val4 = in_U[row * cols + pivot_quarts];
+  double pivot_val, head_row_val;
+  switch (pivot & 3) {
+  case 0:
+    pivot_val = pivot_val4.s0;
+    head_row_val = head_row_val4.s0;
+    break;
+  case 1:
+    pivot_val = pivot_val4.s1;
+    head_row_val = head_row_val4.s1;
+    break;
+  case 2:
+    pivot_val = pivot_val4.s2;
+    head_row_val = head_row_val4.s2;
+    break;
+  case 3:
+    pivot_val = pivot_val4.s3;
+    head_row_val = head_row_val4.s3;
+    break;
+  }
+  double mult = -head_row_val / pivot_val;
+
+  double4 pivot_row_val = in_U[pivot * cols + col];
+  double4 old_val = in_U[row * cols + col];
+  double4 new_val = old_val + pivot_row_val * (double4)(mult);
   out_U[row * cols + col] = new_val;
 }
 

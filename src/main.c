@@ -107,7 +107,10 @@ int main(int argc, char *const *argv)
     case 4:
         strcat(oclfile, "/gaussian_elimination_no_pivot.ocl");
         clCreateStatus(&status, oclfile);
-        x = Gaussian_elimination_no_pivot_gpu_buffer(U, NULL, n, &status);
+        if ((n + 1) & 3 || !vectorize)
+            x = Gaussian_elimination_no_pivot_gpu_buffer(U, NULL, n, &status);
+        else
+            x = Gaussian_elimination_no_pivot_gpu_buffer_vec(U, NULL, n, &status);
         clFreeStatus(&status);
         break;
     case 5:
@@ -127,7 +130,10 @@ int main(int argc, char *const *argv)
     case 7:
         strcat(oclfile, "/gaussian_elimination_pivot.ocl");
         clCreateStatus(&status, oclfile);
-        x = Gaussian_elimination_pivot_gpu_buffer(U, NULL, n, &status);
+        if ((n + 1) & 3 || !vectorize)
+            x = Gaussian_elimination_pivot_gpu_buffer(U, NULL, n, &status);
+        else
+            x = Gaussian_elimination_pivot_gpu_buffer_vec(U, NULL, n, &status);
         clFreeStatus(&status);
         break;
     default:

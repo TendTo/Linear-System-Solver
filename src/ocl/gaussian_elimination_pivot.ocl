@@ -177,7 +177,7 @@ kernel void gaussian_elimination_pivot_texture_vec(int pivot, image2d_t read_onl
   const int cols = get_image_width(in_U);
   const int rows = get_image_height(in_U);
 
-  const int li = get_local_id(0) * get_local_size(0) + get_local_id(1);
+  const int li = get_local_id(1) * get_local_size(0) + get_local_id(0);
   const int n_li = get_local_size(0) * get_local_size(1);
 
   // Fill the local memory
@@ -187,7 +187,7 @@ kernel void gaussian_elimination_pivot_texture_vec(int pivot, image2d_t read_onl
       lmem[i] = fabs(read_imagef(in_U, s, (int2)(pivot_quarts, pivot + i)).s0);
       break;
     case 1:
-      lmem[i] = fabs(read_imagef(in_U, s, (int2)(pivot_quarts, pivot + i)).s0);
+      lmem[i] = fabs(read_imagef(in_U, s, (int2)(pivot_quarts, pivot + i)).s1);
       break;
     case 2:
       lmem[i] = fabs(read_imagef(in_U, s, (int2)(pivot_quarts, pivot + i)).s2);
@@ -260,10 +260,6 @@ kernel void gaussian_elimination_pivot_texture_vec(int pivot, image2d_t read_onl
     pivot_val = pivot_val4.s3;
     head_row_val = head_row_val4.s3;
     break;
-  default:
-    pivot_val = 0.0f;
-    head_row_val = 0.0f;
-    break;
   }
   float mult = -head_row_val / pivot_val;
 
@@ -314,9 +310,6 @@ kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, i
           break;
         case 3:
           coefficient = coefficient4.s3;
-          break;
-        default:
-          coefficient = 0.0f;
           break;
         }
         lmem[col] = lmem[rows + col] * coefficient;
@@ -369,9 +362,6 @@ kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, i
           break;
         case 3:
           coefficient = coefficient4.s3;
-          break;
-        default:
-          coefficient = 1.0f;
           break;
         }
         sum -= lmem[row + 1];
@@ -452,6 +442,111 @@ kernel void gaussian_elimination_pivot_buffer(int rows, int cols, int pivot, glo
     out_U[pivot * cols + col] = pivot_row_val;
     if (col == pivot + 1)
       out_U[pivot * cols + pivot] = pivot_val;
+  }
+}
+
+kernel void gaussian_elimination_pivot_buffer_vec(int rows, int cols, int pivot, global double4 *restrict in_U,
+                                              global double4 *restrict out_U, local double *restrict lmem,
+                                              local uint *restrict i_lmem) {
+  const int pivot_quarts = pivot / 4;
+  const int col = get_global_id(0) + pivot / 4;
+  const int row = get_global_id(1) + pivot + 1;
+
+  const int li = get_local_id(1) * get_local_size(0) + get_local_id(0);
+  const int n_li = get_local_size(0) * get_local_size(1);
+
+  // Fill the local memory
+  for (int i = li; pivot + i < rows; i += n_li) {
+    switch (pivot & 3) {
+    case 0:
+      lmem[i] = fabs(in_U[(pivot + i) * cols + pivot_quarts]).s0;
+      break;
+    case 1:
+      lmem[i] = fabs(in_U[(pivot + i) * cols + pivot_quarts]).s1;
+      break;
+    case 2:
+      lmem[i] = fabs(in_U[(pivot + i) * cols + pivot_quarts]).s2;
+      break;
+    case 3:
+      lmem[i] = fabs(in_U[(pivot + i) * cols + pivot_quarts]).s3;
+      break;
+    }
+    i_lmem[i] = i + pivot;
+  }
+  barrier(CLK_LOCAL_MEM_FENCE);
+
+  // Choose the best pivot by finding the row with the grater value
+  int rows_remaining = rows - pivot;
+  int is_odd = rows_remaining & 1;
+  for (int i = rows_remaining >> 1; i > 0; i = i >> 1) {
+    for (int temp_col = li; temp_col < i; temp_col += n_li) {
+      int index_max = i_lmem[temp_col];
+      int old_index_max = index_max;
+      double old_max = lmem[temp_col];
+      double new_max = lmem[temp_col + i];
+      if (new_max > old_max) {
+        old_max = new_max;
+        index_max = i_lmem[temp_col + i];
+      }
+      if (li == i - 1 && is_odd) {
+        double odd_last_max = lmem[temp_col + i + 1];
+        if (odd_last_max > old_max) {
+          old_max = odd_last_max;
+          index_max = i_lmem[temp_col + i + 1];
+        }
+      }
+      if (index_max != old_index_max) {
+        lmem[temp_col] = old_max;
+        i_lmem[temp_col] = index_max;
+      }
+    }
+    barrier(CLK_LOCAL_MEM_FENCE);
+    is_odd = i & 1;
+  }
+  int pivot_row = i_lmem[0];
+
+  if (col >= cols || row >= rows)
+    return;
+
+  double4 old_val, head_row_val4;
+  double4 pivot_val4 = in_U[pivot_row * cols + pivot_quarts];
+  if (row != pivot_row) {
+    head_row_val4 = in_U[row * cols + pivot_quarts];
+    old_val = in_U[row * cols + col];
+  } else {
+    head_row_val4 = in_U[pivot * cols + pivot_quarts];
+    old_val = in_U[pivot * cols + col];
+  }
+  double pivot_val, head_row_val;
+  switch (pivot & 3) {
+  case 0:
+    pivot_val = pivot_val4.s0;
+    head_row_val = head_row_val4.s0;
+    break;
+  case 1:
+    pivot_val = pivot_val4.s1;
+    head_row_val = head_row_val4.s1;
+    break;
+  case 2:
+    pivot_val = pivot_val4.s2;
+    head_row_val = head_row_val4.s2;
+    break;
+  case 3:
+    pivot_val = pivot_val4.s3;
+    head_row_val = head_row_val4.s3;
+    break;
+  }
+  double mult = -head_row_val / pivot_val;
+
+  double4 pivot_row_val = in_U[pivot_row * cols + col];
+  double4 new_val = old_val + pivot_row_val * (double4)(mult);
+  out_U[row * cols + col] = new_val;
+
+  // Copy the pivot row on the output
+  if (row == pivot + 1) {
+    out_U[pivot * cols + col] = pivot_row_val;
+    if (col == pivot + 1)
+      out_U[pivot * cols + pivot_quarts] = pivot_val4;
   }
 }
 
