@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['nsuite_25',['NSUITE',['../start__test_8c.html#a33a933c1600c6745d5cbca5013723a03',1,'start_test.c']]]
+  ['linear_20system_20solver_20documentation_31',['Linear system solver documentation',['../md__d_1__programmazione__v_s_code__linear-_system-_solver_docs_documentation__r_e_a_d_m_e.html',1,'']]]
 ];

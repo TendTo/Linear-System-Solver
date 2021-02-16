@@ -22,7 +22,6 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Linear system solver
-   &#160;<span id="projectnumber">v0.0.1</span>
    </div>
    <div id="projectbrief">A linear system solver based on OpenCL aimed to take advantage of the GPU to improve the performance on large systems</div>
   </td>
@@ -78,7 +77,7 @@ $(function() {
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#if 0 // example usage:</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="ocl__boiler_8h.html">ocl_boiler.h</a>&quot;</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keywordtype">int</span> <a class="code" href="main_8c.html#abf9e6b7e6f15df4b525a2e7705ba3089">main</a>(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> *argv[])</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span> *argv[])</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;{</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;    cl_platform_id p = <a class="code" href="ocl__boiler_8h.html#a6d628307adbd20dfd088d1cfb6b80860">select_platform</a>();</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;    cl_device_id d = <a class="code" href="ocl__boiler_8h.html#aed444ffc95db66e511542033a107e537">select_device</a>(p);</div>
@@ -93,7 +92,7 @@ $(function() {
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;}</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno"><a class="line" href="ocl__boiler_8h.html#a5990dea19d4ccb046a3d81b311457add">   31</a></span>&#160;<span class="preprocessor">#define CL_TARGET_OPENCL_VERSION 120 // Using version 1.2 of the OpenCL library</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#define CL_TARGET_OPENCL_VERSION 120 // Using version 1.2 of the OpenCL library</span></div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="comment">/* Include the headers defining the OpenCL host API */</span></div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#ifdef __APPLE__</span></div>
@@ -108,15 +107,15 @@ $(function() {
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor">#include &lt;time.h&gt;</span></div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#include &lt;string.h&gt;</span></div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="ocl__boiler_8h.html#aeca034f67218340ecb2261a22c2f3dcd">   46</a></span>&#160;<span class="preprocessor">#define BUFSIZE 4096</span></div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#define BUFSIZE 4096</span></div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
 <div class="line"><a name="l00052"></a><span class="lineno"><a class="line" href="structcl__status.html">   52</a></span>&#160;<span class="keyword">typedef</span> <span class="keyword">struct</span></div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;{</div>
-<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="structcl__status.html#abd5f39c58d8cb5294399dc446e02f48e">   54</a></span>&#160;    cl_platform_id <a class="code" href="structcl__status.html#abd5f39c58d8cb5294399dc446e02f48e">p</a>;</div>
-<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="structcl__status.html#a71de3938851bbdcde1868e96d0aa795c">   55</a></span>&#160;    cl_device_id <a class="code" href="structcl__status.html#a71de3938851bbdcde1868e96d0aa795c">d</a>;</div>
-<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="structcl__status.html#affe7c712352b8c5a91c0dc738a7b10e0">   56</a></span>&#160;    cl_context <a class="code" href="structcl__status.html#affe7c712352b8c5a91c0dc738a7b10e0">ctx</a>;</div>
-<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="structcl__status.html#a37a5368a09afa058407d31edc59bc9fc">   57</a></span>&#160;    cl_command_queue <a class="code" href="structcl__status.html#a37a5368a09afa058407d31edc59bc9fc">que</a>;</div>
-<div class="line"><a name="l00058"></a><span class="lineno"><a class="line" href="structcl__status.html#a63a32a249656cdb9a6148b46a41d1954">   58</a></span>&#160;    cl_program <a class="code" href="structcl__status.html#a63a32a249656cdb9a6148b46a41d1954">prog</a>;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    cl_platform_id p;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    cl_device_id d;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    cl_context ctx;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    cl_command_queue que;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    cl_program prog;</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;} <a class="code" href="structcl__status.html">cl_status</a>;</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="keywordtype">void</span> <a class="code" href="ocl__boiler_8h.html#a151d78df35ce341dec48596da26be644">ocl_check</a>(cl_int err, <span class="keyword">const</span> <span class="keywordtype">char</span> *msg, ...);</div>
@@ -153,19 +152,13 @@ $(function() {
 <div class="ttc" id="aocl__boiler_8h_html_a0d5d13bff5d4521b70a1cce9c662722b"><div class="ttname"><a href="ocl__boiler_8h.html#a0d5d13bff5d4521b70a1cce9c662722b">round_mul_up</a></div><div class="ttdeci">size_t round_mul_up(size_t gws, size_t lws)</div><div class="ttdef"><b>Definition:</b> ocl_boiler.c:230</div></div>
 <div class="ttc" id="aocl__boiler_8h_html_a437d81f0b2fe807a08d3d511045acfbd"><div class="ttname"><a href="ocl__boiler_8h.html#a437d81f0b2fe807a08d3d511045acfbd">total_runtime_ns</a></div><div class="ttdeci">cl_ulong total_runtime_ns(cl_event from, cl_event to)</div><div class="ttdef"><b>Definition:</b> ocl_boiler.c:207</div></div>
 <div class="ttc" id="aocl__boiler_8h_html_aed444ffc95db66e511542033a107e537"><div class="ttname"><a href="ocl__boiler_8h.html#aed444ffc95db66e511542033a107e537">select_device</a></div><div class="ttdeci">cl_device_id select_device(cl_platform_id p)</div><div class="ttdef"><b>Definition:</b> ocl_boiler.c:57</div></div>
-<div class="ttc" id="astructcl__status_html_abd5f39c58d8cb5294399dc446e02f48e"><div class="ttname"><a href="structcl__status.html#abd5f39c58d8cb5294399dc446e02f48e">cl_status::p</a></div><div class="ttdeci">cl_platform_id p</div><div class="ttdef"><b>Definition:</b> ocl_boiler.h:54</div></div>
-<div class="ttc" id="amain_8c_html_abf9e6b7e6f15df4b525a2e7705ba3089"><div class="ttname"><a href="main_8c.html#abf9e6b7e6f15df4b525a2e7705ba3089">main</a></div><div class="ttdeci">int main(int argc, char const *argv[])</div><div class="ttdef"><b>Definition:</b> main.c:3</div></div>
 <div class="ttc" id="aocl__boiler_8h_html_aac58dd6b290c18f33e34d44eb26306f8"><div class="ttname"><a href="ocl__boiler_8h.html#aac58dd6b290c18f33e34d44eb26306f8">clCreateStatus</a></div><div class="ttdeci">void clCreateStatus(cl_status *status, const char *const fname)</div><div class="ttdef"><b>Definition:</b> ocl_boiler.c:174</div></div>
 <div class="ttc" id="astructcl__status_html"><div class="ttname"><a href="structcl__status.html">cl_status</a></div><div class="ttdoc">This structure contains all the initialized info neede to run an OpenCL applicative.</div><div class="ttdef"><b>Definition:</b> ocl_boiler.h:52</div></div>
 <div class="ttc" id="aocl__boiler_8h_html_a4583f42c2a2eb023080af42d5a7d7364"><div class="ttname"><a href="ocl__boiler_8h.html#a4583f42c2a2eb023080af42d5a7d7364">create_program</a></div><div class="ttdeci">cl_program create_program(const char *const fname, cl_context ctx, cl_device_id d)</div><div class="ttdef"><b>Definition:</b> ocl_boiler.c:121</div></div>
 <div class="ttc" id="aocl__boiler_8h_html_a151d78df35ce341dec48596da26be644"><div class="ttname"><a href="ocl__boiler_8h.html#a151d78df35ce341dec48596da26be644">ocl_check</a></div><div class="ttdeci">void ocl_check(cl_int err, const char *msg,...)</div><div class="ttdef"><b>Definition:</b> ocl_boiler.c:3</div></div>
 <div class="ttc" id="aocl__boiler_8h_html"><div class="ttname"><a href="ocl__boiler_8h.html">ocl_boiler.h</a></div><div class="ttdoc">OpenCL boilerplate A collection of functions wrapping the most common boilerplate of an OpenCL progra...</div></div>
-<div class="ttc" id="astructcl__status_html_a63a32a249656cdb9a6148b46a41d1954"><div class="ttname"><a href="structcl__status.html#a63a32a249656cdb9a6148b46a41d1954">cl_status::prog</a></div><div class="ttdeci">cl_program prog</div><div class="ttdef"><b>Definition:</b> ocl_boiler.h:58</div></div>
 <div class="ttc" id="aocl__boiler_8h_html_af6163cfda5df3c77350dcef3e4d68494"><div class="ttname"><a href="ocl__boiler_8h.html#af6163cfda5df3c77350dcef3e4d68494">create_context</a></div><div class="ttdeci">cl_context create_context(cl_platform_id p, cl_device_id d)</div><div class="ttdef"><b>Definition:</b> ocl_boiler.c:97</div></div>
-<div class="ttc" id="astructcl__status_html_a71de3938851bbdcde1868e96d0aa795c"><div class="ttname"><a href="structcl__status.html#a71de3938851bbdcde1868e96d0aa795c">cl_status::d</a></div><div class="ttdeci">cl_device_id d</div><div class="ttdef"><b>Definition:</b> ocl_boiler.h:55</div></div>
 <div class="ttc" id="aocl__boiler_8h_html_aa1d89daf5531e1f16509f66b1f6de6a6"><div class="ttname"><a href="ocl__boiler_8h.html#aa1d89daf5531e1f16509f66b1f6de6a6">total_runtime_ms</a></div><div class="ttdeci">double total_runtime_ms(cl_event from, cl_event to)</div><div class="ttdef"><b>Definition:</b> ocl_boiler.c:225</div></div>
-<div class="ttc" id="astructcl__status_html_a37a5368a09afa058407d31edc59bc9fc"><div class="ttname"><a href="structcl__status.html#a37a5368a09afa058407d31edc59bc9fc">cl_status::que</a></div><div class="ttdeci">cl_command_queue que</div><div class="ttdef"><b>Definition:</b> ocl_boiler.h:57</div></div>
-<div class="ttc" id="astructcl__status_html_affe7c712352b8c5a91c0dc738a7b10e0"><div class="ttname"><a href="structcl__status.html#affe7c712352b8c5a91c0dc738a7b10e0">cl_status::ctx</a></div><div class="ttdeci">cl_context ctx</div><div class="ttdef"><b>Definition:</b> ocl_boiler.h:56</div></div>
 <div class="ttc" id="aocl__boiler_8h_html_ae29c6a3df57480f1a4a7f41e6b11a100"><div class="ttname"><a href="ocl__boiler_8h.html#ae29c6a3df57480f1a4a7f41e6b11a100">runtime_ns</a></div><div class="ttdeci">cl_ulong runtime_ns(cl_event evt)</div><div class="ttdef"><b>Definition:</b> ocl_boiler.c:194</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

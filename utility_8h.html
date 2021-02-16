@@ -22,7 +22,6 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Linear system solver
-   &#160;<span id="projectnumber">v0.0.1</span>
    </div>
    <div id="projectbrief">A linear system solver based on OpenCL aimed to take advantage of the GPU to improve the performance on large systems</div>
   </td>
@@ -80,54 +79,55 @@ $(function() {
 <div class="textblock"><code>#include &lt;stdio.h&gt;</code><br />
 <code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
+<code>#include &lt;math.h&gt;</code><br />
 </div>
 <p><a href="utility_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a9c7b069fee3c8184e14a7de8e5da2dc6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#a9c7b069fee3c8184e14a7de8e5da2dc6">PRECISION</a>&#160;&#160;&#160;0.0001</td></tr>
+<tr class="memitem:a9c7b069fee3c8184e14a7de8e5da2dc6"><td class="memItemLeft" align="right" valign="top"><a id="a9c7b069fee3c8184e14a7de8e5da2dc6"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>PRECISION</b>&#160;&#160;&#160;0.1</td></tr>
 <tr class="separator:a9c7b069fee3c8184e14a7de8e5da2dc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a39827b27d23a98009db275a3e6c39004"><td class="memItemLeft" align="right" valign="top">float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#a39827b27d23a98009db275a3e6c39004">d_to_f_array</a> (double *a, size_t n)</td></tr>
+<tr class="separator:a39827b27d23a98009db275a3e6c39004"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7b69596bc36da737c00152cdcb198d76"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#a7b69596bc36da737c00152cdcb198d76">f_to_d_array</a> (float *a, size_t n)</td></tr>
+<tr class="separator:a7b69596bc36da737c00152cdcb198d76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad8592e097a93ad8c729770707bbe493"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#aad8592e097a93ad8c729770707bbe493">generate_complete_matrix</a> (int seed, int n)</td></tr>
+<tr class="separator:aad8592e097a93ad8c729770707bbe493"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae420206f02550880814c60922abb8eaf"><td class="memItemLeft" align="right" valign="top">float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#ae420206f02550880814c60922abb8eaf">generate_complete_matrix_f</a> (int seed, int n)</td></tr>
+<tr class="separator:ae420206f02550880814c60922abb8eaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91734b5d5367c125d3d7909f4ba51eaf"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#a91734b5d5367c125d3d7909f4ba51eaf">create_complete_matrix_lin</a> (double *A, double *b, size_t n)</td></tr>
 <tr class="separator:a91734b5d5367c125d3d7909f4ba51eaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebe5d32deb7731308ff4f9c8bc6720c7"><td class="memItemLeft" align="right" valign="top">float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#aebe5d32deb7731308ff4f9c8bc6720c7">create_complete_matrix_lin_f</a> (float *A, float *b, size_t n)</td></tr>
+<tr class="separator:aebe5d32deb7731308ff4f9c8bc6720c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4b5790f785b888e3136cd4e78561a63"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#ab4b5790f785b888e3136cd4e78561a63">print_arr</a> (double *m, size_t n, char label)</td></tr>
 <tr class="separator:ab4b5790f785b888e3136cd4e78561a63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac99bd580c6ac311bba4bf05405fcc6c4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#ac99bd580c6ac311bba4bf05405fcc6c4">print_mat</a> (double **m, size_t rows, size_t cols, char label)</td></tr>
 <tr class="separator:ac99bd580c6ac311bba4bf05405fcc6c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3ad73efb715cca3ee55a97f7b9c4338"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#ad3ad73efb715cca3ee55a97f7b9c4338">print_mat_lin</a> (double *m, size_t rows, size_t cols, char label)</td></tr>
 <tr class="separator:ad3ad73efb715cca3ee55a97f7b9c4338"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad5c9591ccf819236905d1a426e4952f3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#ad5c9591ccf819236905d1a426e4952f3">compare_arr</a> (double *a, double *b, size_t n)</td></tr>
-<tr class="separator:ad5c9591ccf819236905d1a426e4952f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a44aacbce4ce73aa20ca7d62232e997"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#a8a44aacbce4ce73aa20ca7d62232e997">compare_arr</a> (double *a, const double *b, size_t n)</td></tr>
+<tr class="separator:a8a44aacbce4ce73aa20ca7d62232e997"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb30a1d5de340d02918ebe8652018197"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#afb30a1d5de340d02918ebe8652018197">compare_mat</a> (double **a, double **b, size_t cols, size_t rows)</td></tr>
 <tr class="separator:afb30a1d5de340d02918ebe8652018197"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a682fe5f8505e8a50acb3c7cc459f9138"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#a682fe5f8505e8a50acb3c7cc459f9138">swap</a> (double *a, double *b)</td></tr>
 <tr class="separator:a682fe5f8505e8a50acb3c7cc459f9138"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad28fc5f2fa653c918916d27a160fc08b"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#ad28fc5f2fa653c918916d27a160fc08b">read_matrix_from_file</a> (const char *fname)</td></tr>
 <tr class="separator:ad28fc5f2fa653c918916d27a160fc08b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a853dc2c381a140dcb1a678cc10100faf"><td class="memItemLeft" align="right" valign="top">double *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#a853dc2c381a140dcb1a678cc10100faf">read_matrix_n_from_file</a> (const char *fname, int n)</td></tr>
+<tr class="separator:a853dc2c381a140dcb1a678cc10100faf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f60083877a0bc674c1aace7f3cf81dd"><td class="memItemLeft" align="right" valign="top">float *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#a7f60083877a0bc674c1aace7f3cf81dd">read_matrix_from_file_f</a> (const char *fname)</td></tr>
+<tr class="separator:a7f60083877a0bc674c1aace7f3cf81dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0decb3925e775ef6d0411a5fc4a5e40"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utility_8h.html#ac0decb3925e775ef6d0411a5fc4a5e40">check_ret</a> (int ret, const char *mes)</td></tr>
 <tr class="separator:ac0decb3925e775ef6d0411a5fc4a5e40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Utility functions Collection of utility functions, usually used for debugging purposes. </p>
 <dl class="section author"><dt>Author</dt><dd>TendTo (<a href="https://github.com/TendTo">https://github.com/TendTo</a>) </dd></dl>
-</div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a9c7b069fee3c8184e14a7de8e5da2dc6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c7b069fee3c8184e14a7de8e5da2dc6">&#9670;&nbsp;</a></span>PRECISION</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define PRECISION&#160;&#160;&#160;0.0001</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
+</div><h2 class="groupheader">Function Documentation</h2>
 <a id="ac0decb3925e775ef6d0411a5fc4a5e40"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac0decb3925e775ef6d0411a5fc4a5e40">&#9670;&nbsp;</a></span>check_ret()</h2>
 
@@ -164,8 +164,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ad5c9591ccf819236905d1a426e4952f3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad5c9591ccf819236905d1a426e4952f3">&#9670;&nbsp;</a></span>compare_arr()</h2>
+<a id="a8a44aacbce4ce73aa20ca7d62232e997"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8a44aacbce4ce73aa20ca7d62232e997">&#9670;&nbsp;</a></span>compare_arr()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -179,7 +179,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">double *&#160;</td>
+          <td class="paramtype">const double *&#160;</td>
           <td class="paramname"><em>b</em>, </td>
         </tr>
         <tr>
@@ -289,11 +289,203 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Copy the given linear matrix A to a newly created linear matrix. If a b vector is given, it is assimilated al a new column of the new matrix, wich will be (n X n + 1)</p>
+<p>Copies the given linear matrix A to a newly created linear matrix. If a b vector is given, it is assimilated as a new column of the new matrix, wich will be (n X n + 1)</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">A</td><td>Linear matrix to copy. If b is NULL, it will be assumed to have size (n X n + 1) </td></tr>
     <tr><td class="paramname">b</td><td>Vector of the solutions to append as a new column. If NULL, the first matrix will be considered as having it already in it </td></tr>
+    <tr><td class="paramname">n</td><td>Number of unknowns</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Complete matrix of size (n X n + 1) </dd></dl>
+
+</div>
+</div>
+<a id="aebe5d32deb7731308ff4f9c8bc6720c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebe5d32deb7731308ff4f9c8bc6720c7">&#9670;&nbsp;</a></span>create_complete_matrix_lin_f()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float* create_complete_matrix_lin_f </td>
+          <td>(</td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>A</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>n</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Copies the given linear matrix A to a newly created linear matrix. If a b vector is given, it is assimilated as a new column of the new matrix, wich will be (n X n + 1)</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>Linear matrix to copy. If b is NULL, it will be assumed to have size (n X n + 1) </td></tr>
+    <tr><td class="paramname">b</td><td>Vector of the solutions to append as a new column. If NULL, the first matrix will be considered as having it already in it </td></tr>
+    <tr><td class="paramname">n</td><td>Number of unknowns</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Complete matrix of size (n X n + 1) </dd></dl>
+
+</div>
+</div>
+<a id="a39827b27d23a98009db275a3e6c39004"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39827b27d23a98009db275a3e6c39004">&#9670;&nbsp;</a></span>d_to_f_array()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float* d_to_f_array </td>
+          <td>(</td>
+          <td class="paramtype">double *&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>n</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Casts each value in the array from double to float</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>Array to cast </td></tr>
+    <tr><td class="paramname">n</td><td>Length of the array</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to the array with the correct type </dd></dl>
+
+</div>
+</div>
+<a id="a7b69596bc36da737c00152cdcb198d76"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7b69596bc36da737c00152cdcb198d76">&#9670;&nbsp;</a></span>f_to_d_array()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double* f_to_d_array </td>
+          <td>(</td>
+          <td class="paramtype">float *&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>n</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Casts each value in the array from float to double</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">A</td><td>Array to cast </td></tr>
+    <tr><td class="paramname">n</td><td>Length of the array</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to the array with the correct type </dd></dl>
+
+</div>
+</div>
+<a id="aad8592e097a93ad8c729770707bbe493"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad8592e097a93ad8c729770707bbe493">&#9670;&nbsp;</a></span>generate_complete_matrix()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double* generate_complete_matrix </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>seed</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Generates a complete matrix from a random sequence of numbers</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">seed</td><td>Seed used to generate the sequence of numbers </td></tr>
+    <tr><td class="paramname">n</td><td>Number of unknowns</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Complete matrix of size (n X n + 1) </dd></dl>
+
+</div>
+</div>
+<a id="ae420206f02550880814c60922abb8eaf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae420206f02550880814c60922abb8eaf">&#9670;&nbsp;</a></span>generate_complete_matrix_f()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float* generate_complete_matrix_f </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>seed</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Generates a complete matrix of floats from a random sequence of numbers</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">seed</td><td>Seed used to generate the sequence of numbers </td></tr>
     <tr><td class="paramname">n</td><td>Number of unknowns</td></tr>
   </table>
   </dd>
@@ -462,6 +654,69 @@ Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">fname</td><td>Name of the file</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Complete matrix written in the file </dd></dl>
+
+</div>
+</div>
+<a id="a7f60083877a0bc674c1aace7f3cf81dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f60083877a0bc674c1aace7f3cf81dd">&#9670;&nbsp;</a></span>read_matrix_from_file_f()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float* read_matrix_from_file_f </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>fname</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Reads the values in a file and produces the corrisponding complete matrix of floats</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fname</td><td>Name of the file</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Complete matrix written in the file </dd></dl>
+
+</div>
+</div>
+<a id="a853dc2c381a140dcb1a678cc10100faf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a853dc2c381a140dcb1a678cc10100faf">&#9670;&nbsp;</a></span>read_matrix_n_from_file()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double* read_matrix_n_from_file </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>fname</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Reads the values in a file and produces the corrisponding complete matrix of dimension n</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fname</td><td>Name of the file </td></tr>
+    <tr><td class="paramname">n</td><td>Number of unknowns</td></tr>
   </table>
   </dd>
 </dl>

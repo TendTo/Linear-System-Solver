@@ -1,15 +1,14 @@
 var searchData=
 [
-  ['check_5fret_1',['check_ret',['../utility_8h.html#ac0decb3925e775ef6d0411a5fc4a5e40',1,'check_ret(int ret, const char *mes):&#160;utility.c'],['../utility_8c.html#ac0decb3925e775ef6d0411a5fc4a5e40',1,'check_ret(int ret, const char *mes):&#160;utility.c']]],
+  ['check_5fret_1',['check_ret',['../utility_8h.html#ac0decb3925e775ef6d0411a5fc4a5e40',1,'utility.c']]],
   ['cl_5fstatus_2',['cl_status',['../structcl__status.html',1,'']]],
-  ['cl_5ftarget_5fopencl_5fversion_3',['CL_TARGET_OPENCL_VERSION',['../ocl__boiler_8h.html#a5990dea19d4ccb046a3d81b311457add',1,'ocl_boiler.h']]],
-  ['clcreatestatus_4',['clCreateStatus',['../ocl__boiler_8h.html#aac58dd6b290c18f33e34d44eb26306f8',1,'clCreateStatus(cl_status *status, const char *const fname):&#160;ocl_boiler.c'],['../ocl__boiler_8c.html#aac58dd6b290c18f33e34d44eb26306f8',1,'clCreateStatus(cl_status *status, const char *const fname):&#160;ocl_boiler.c']]],
-  ['clfreestatus_5',['clFreeStatus',['../ocl__boiler_8h.html#abb6d2e2befba3ad577c69c8057b8dde4',1,'clFreeStatus(cl_status *status):&#160;ocl_boiler.c'],['../ocl__boiler_8c.html#abb6d2e2befba3ad577c69c8057b8dde4',1,'clFreeStatus(cl_status *status):&#160;ocl_boiler.c']]],
-  ['compare_5farr_6',['compare_arr',['../utility_8h.html#ad5c9591ccf819236905d1a426e4952f3',1,'compare_arr(double *a, double *b, size_t n):&#160;utility.c'],['../utility_8c.html#ad5c9591ccf819236905d1a426e4952f3',1,'compare_arr(double *a, double *b, size_t n):&#160;utility.c']]],
-  ['compare_5fmat_7',['compare_mat',['../utility_8h.html#afb30a1d5de340d02918ebe8652018197',1,'compare_mat(double **a, double **b, size_t cols, size_t rows):&#160;utility.c'],['../utility_8c.html#a9aeae3229d0932397d2ef9f3eecb6fc6',1,'compare_mat(double **a, double **b, size_t rows, size_t cols):&#160;utility.c']]],
-  ['create_5fcomplete_5fmatrix_5flin_8',['create_complete_matrix_lin',['../utility_8h.html#a91734b5d5367c125d3d7909f4ba51eaf',1,'create_complete_matrix_lin(double *A, double *b, size_t n):&#160;utility.c'],['../utility_8c.html#a91734b5d5367c125d3d7909f4ba51eaf',1,'create_complete_matrix_lin(double *A, double *b, size_t n):&#160;utility.c']]],
-  ['create_5fcontext_9',['create_context',['../ocl__boiler_8h.html#af6163cfda5df3c77350dcef3e4d68494',1,'create_context(cl_platform_id p, cl_device_id d):&#160;ocl_boiler.c'],['../ocl__boiler_8c.html#af6163cfda5df3c77350dcef3e4d68494',1,'create_context(cl_platform_id p, cl_device_id d):&#160;ocl_boiler.c']]],
-  ['create_5fprogram_10',['create_program',['../ocl__boiler_8h.html#a4583f42c2a2eb023080af42d5a7d7364',1,'create_program(const char *const fname, cl_context ctx, cl_device_id d):&#160;ocl_boiler.c'],['../ocl__boiler_8c.html#a482dbc9a13bbcb8dea09b4030f698d4d',1,'create_program(const char *const fname, cl_context ctx, cl_device_id dev):&#160;ocl_boiler.c']]],
-  ['create_5fqueue_11',['create_queue',['../ocl__boiler_8h.html#a96c8f17a9f2e1924a6e4783a8a1f53c9',1,'create_queue(cl_context ctx, cl_device_id d):&#160;ocl_boiler.c'],['../ocl__boiler_8c.html#a96c8f17a9f2e1924a6e4783a8a1f53c9',1,'create_queue(cl_context ctx, cl_device_id d):&#160;ocl_boiler.c']]],
-  ['ctx_12',['ctx',['../structcl__status.html#affe7c712352b8c5a91c0dc738a7b10e0',1,'cl_status']]]
+  ['clcreatestatus_3',['clCreateStatus',['../ocl__boiler_8h.html#aac58dd6b290c18f33e34d44eb26306f8',1,'ocl_boiler.c']]],
+  ['clfreestatus_4',['clFreeStatus',['../ocl__boiler_8h.html#abb6d2e2befba3ad577c69c8057b8dde4',1,'ocl_boiler.c']]],
+  ['compare_5farr_5',['compare_arr',['../utility_8h.html#a8a44aacbce4ce73aa20ca7d62232e997',1,'utility.c']]],
+  ['compare_5fmat_6',['compare_mat',['../utility_8h.html#afb30a1d5de340d02918ebe8652018197',1,'utility.c']]],
+  ['create_5fcomplete_5fmatrix_5flin_7',['create_complete_matrix_lin',['../utility_8h.html#a91734b5d5367c125d3d7909f4ba51eaf',1,'utility.c']]],
+  ['create_5fcomplete_5fmatrix_5flin_5ff_8',['create_complete_matrix_lin_f',['../utility_8h.html#aebe5d32deb7731308ff4f9c8bc6720c7',1,'utility.c']]],
+  ['create_5fcontext_9',['create_context',['../ocl__boiler_8h.html#af6163cfda5df3c77350dcef3e4d68494',1,'ocl_boiler.c']]],
+  ['create_5fprogram_10',['create_program',['../ocl__boiler_8h.html#a4583f42c2a2eb023080af42d5a7d7364',1,'ocl_boiler.c']]],
+  ['create_5fqueue_11',['create_queue',['../ocl__boiler_8h.html#a96c8f17a9f2e1924a6e4783a8a1f53c9',1,'ocl_boiler.c']]]
 ];

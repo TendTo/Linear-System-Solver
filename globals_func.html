@@ -22,7 +22,6 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Linear system solver
-   &#160;<span id="projectnumber">v0.0.1</span>
    </div>
    <div id="projectbrief">A linear system solver based on OpenCL aimed to take advantage of the GPU to improve the performance on large systems</div>
   </td>
@@ -68,77 +67,97 @@ $(function() {
 <h3><a id="index_c"></a>- c -</h3><ul>
 <li>check_ret()
 : <a class="el" href="utility_8h.html#ac0decb3925e775ef6d0411a5fc4a5e40">utility.h</a>
-, <a class="el" href="utility_8c.html#ac0decb3925e775ef6d0411a5fc4a5e40">utility.c</a>
 </li>
 <li>clCreateStatus()
-: <a class="el" href="ocl__boiler_8c.html#aac58dd6b290c18f33e34d44eb26306f8">ocl_boiler.c</a>
-, <a class="el" href="ocl__boiler_8h.html#aac58dd6b290c18f33e34d44eb26306f8">ocl_boiler.h</a>
+: <a class="el" href="ocl__boiler_8h.html#aac58dd6b290c18f33e34d44eb26306f8">ocl_boiler.h</a>
 </li>
 <li>clFreeStatus()
 : <a class="el" href="ocl__boiler_8h.html#abb6d2e2befba3ad577c69c8057b8dde4">ocl_boiler.h</a>
-, <a class="el" href="ocl__boiler_8c.html#abb6d2e2befba3ad577c69c8057b8dde4">ocl_boiler.c</a>
 </li>
 <li>compare_arr()
-: <a class="el" href="utility_8c.html#ad5c9591ccf819236905d1a426e4952f3">utility.c</a>
-, <a class="el" href="utility_8h.html#ad5c9591ccf819236905d1a426e4952f3">utility.h</a>
+: <a class="el" href="utility_8h.html#a8a44aacbce4ce73aa20ca7d62232e997">utility.h</a>
 </li>
 <li>compare_mat()
 : <a class="el" href="utility_8h.html#afb30a1d5de340d02918ebe8652018197">utility.h</a>
-, <a class="el" href="utility_8c.html#a9aeae3229d0932397d2ef9f3eecb6fc6">utility.c</a>
 </li>
 <li>create_complete_matrix_lin()
 : <a class="el" href="utility_8h.html#a91734b5d5367c125d3d7909f4ba51eaf">utility.h</a>
-, <a class="el" href="utility_8c.html#a91734b5d5367c125d3d7909f4ba51eaf">utility.c</a>
+</li>
+<li>create_complete_matrix_lin_f()
+: <a class="el" href="utility_8h.html#aebe5d32deb7731308ff4f9c8bc6720c7">utility.h</a>
 </li>
 <li>create_context()
 : <a class="el" href="ocl__boiler_8h.html#af6163cfda5df3c77350dcef3e4d68494">ocl_boiler.h</a>
-, <a class="el" href="ocl__boiler_8c.html#af6163cfda5df3c77350dcef3e4d68494">ocl_boiler.c</a>
 </li>
 <li>create_program()
-: <a class="el" href="ocl__boiler_8c.html#a482dbc9a13bbcb8dea09b4030f698d4d">ocl_boiler.c</a>
-, <a class="el" href="ocl__boiler_8h.html#a4583f42c2a2eb023080af42d5a7d7364">ocl_boiler.h</a>
+: <a class="el" href="ocl__boiler_8h.html#a4583f42c2a2eb023080af42d5a7d7364">ocl_boiler.h</a>
 </li>
 <li>create_queue()
-: <a class="el" href="ocl__boiler_8c.html#a96c8f17a9f2e1924a6e4783a8a1f53c9">ocl_boiler.c</a>
-, <a class="el" href="ocl__boiler_8h.html#a96c8f17a9f2e1924a6e4783a8a1f53c9">ocl_boiler.h</a>
+: <a class="el" href="ocl__boiler_8h.html#a96c8f17a9f2e1924a6e4783a8a1f53c9">ocl_boiler.h</a>
+</li>
+</ul>
+
+
+<h3><a id="index_d"></a>- d -</h3><ul>
+<li>d_to_f_array()
+: <a class="el" href="utility_8h.html#a39827b27d23a98009db275a3e6c39004">utility.h</a>
+</li>
+</ul>
+
+
+<h3><a id="index_f"></a>- f -</h3><ul>
+<li>f_to_d_array()
+: <a class="el" href="utility_8h.html#a7b69596bc36da737c00152cdcb198d76">utility.h</a>
 </li>
 </ul>
 
 
 <h3><a id="index_g"></a>- g -</h3><ul>
-<li>Gaussian_reduction_no_pivot()
-: <a class="el" href="gaussian__reduction_8h.html#aaa0499f6a29cae0308c4a4b2455ca298">gaussian_reduction.h</a>
-, <a class="el" href="gaussian__reduction_8c.html#aaa0499f6a29cae0308c4a4b2455ca298">gaussian_reduction.c</a>
+<li>Gaussian_elimination_no_pivot()
+: <a class="el" href="gaussian__elimination__no__pivot_8h.html#ae2d27fd3bf04537fe32ff1800a239c6e">gaussian_elimination_no_pivot.h</a>
 </li>
-<li>Gaussian_reduction_no_pivot_gpu_naive()
-: <a class="el" href="gaussian__reduction_8c.html#a7e76bc081cc06c7f76e6bf7d5706f0ed">gaussian_reduction.c</a>
-, <a class="el" href="gaussian__reduction_8h.html#a7e76bc081cc06c7f76e6bf7d5706f0ed">gaussian_reduction.h</a>
+<li>Gaussian_elimination_no_pivot_gpu_buffer()
+: <a class="el" href="gaussian__elimination__no__pivot_8h.html#a0b2473ffda369bc7df6144b3bb01d821">gaussian_elimination_no_pivot.h</a>
 </li>
-<li>Gaussian_reduction_pivot()
-: <a class="el" href="gaussian__reduction_8c.html#a4d000ff357e1f0a8d78a210ee11fb938">gaussian_reduction.c</a>
-, <a class="el" href="gaussian__reduction_8h.html#a4d000ff357e1f0a8d78a210ee11fb938">gaussian_reduction.h</a>
+<li>Gaussian_elimination_no_pivot_gpu_buffer_vec()
+: <a class="el" href="gaussian__elimination__no__pivot_8h.html#a0f28a627c28657bec42285da1d242165">gaussian_elimination_no_pivot.h</a>
 </li>
-<li>gaussian_reduction_suite()
-: <a class="el" href="test__gaussian__reduction_8h.html#a2ed4dd622bbe7a684a2babc4737fb63f">test_gaussian_reduction.h</a>
+<li>Gaussian_elimination_no_pivot_gpu_lmem()
+: <a class="el" href="gaussian__elimination__no__pivot_8h.html#a14d1359d84f69a5de73b966fb9b29c47">gaussian_elimination_no_pivot.h</a>
 </li>
-</ul>
-
-
-<h3><a id="index_m"></a>- m -</h3><ul>
-<li>main()
-: <a class="el" href="main_8c.html#abf9e6b7e6f15df4b525a2e7705ba3089">main.c</a>
-, <a class="el" href="start__test_8c.html#a840291bc02cba5474a4cb46a9b9566fe">start_test.c</a>
+<li>Gaussian_elimination_no_pivot_gpu_texture()
+: <a class="el" href="gaussian__elimination__no__pivot_8h.html#af68f7415a92085baef8d3582e9335620">gaussian_elimination_no_pivot.h</a>
+</li>
+<li>Gaussian_elimination_no_pivot_gpu_texture_vec()
+: <a class="el" href="gaussian__elimination__no__pivot_8h.html#aef3a4e3ee6be6e02d9651c30f84fbb19">gaussian_elimination_no_pivot.h</a>
+</li>
+<li>Gaussian_elimination_pivot()
+: <a class="el" href="gaussian__elimination__pivot_8h.html#a2ae928befd4ca032e4f5e2bb01c00f6c">gaussian_elimination_pivot.h</a>
+</li>
+<li>Gaussian_elimination_pivot_gpu_buffer()
+: <a class="el" href="gaussian__elimination__pivot_8h.html#a42efb790df8824e8ffc719f040cae88c">gaussian_elimination_pivot.h</a>
+</li>
+<li>Gaussian_elimination_pivot_gpu_buffer_vec()
+: <a class="el" href="gaussian__elimination__pivot_8h.html#ab04af9ce95e2bb7c431d44a1e15962ce">gaussian_elimination_pivot.h</a>
+</li>
+<li>Gaussian_elimination_pivot_gpu_texture()
+: <a class="el" href="gaussian__elimination__pivot_8h.html#a414a649581b008ebaebf59ed714c9ddd">gaussian_elimination_pivot.h</a>
+</li>
+<li>Gaussian_elimination_pivot_gpu_texture_vec()
+: <a class="el" href="gaussian__elimination__pivot_8h.html#a18e818288b98171b2d2cceb078a6ffd2">gaussian_elimination_pivot.h</a>
+</li>
+<li>generate_complete_matrix()
+: <a class="el" href="utility_8h.html#aad8592e097a93ad8c729770707bbe493">utility.h</a>
+</li>
+<li>generate_complete_matrix_f()
+: <a class="el" href="utility_8h.html#ae420206f02550880814c60922abb8eaf">utility.h</a>
 </li>
 </ul>
 
 
 <h3><a id="index_o"></a>- o -</h3><ul>
-<li>ocl_boiler_suite()
-: <a class="el" href="test__ocl__boiler_8h.html#a0745aa3ffd6dfdb01f2d33a8271c33d3">test_ocl_boiler.h</a>
-</li>
 <li>ocl_check()
-: <a class="el" href="ocl__boiler_8c.html#a151d78df35ce341dec48596da26be644">ocl_boiler.c</a>
-, <a class="el" href="ocl__boiler_8h.html#a151d78df35ce341dec48596da26be644">ocl_boiler.h</a>
+: <a class="el" href="ocl__boiler_8h.html#a151d78df35ce341dec48596da26be644">ocl_boiler.h</a>
 </li>
 </ul>
 
@@ -146,15 +165,12 @@ $(function() {
 <h3><a id="index_p"></a>- p -</h3><ul>
 <li>print_arr()
 : <a class="el" href="utility_8h.html#ab4b5790f785b888e3136cd4e78561a63">utility.h</a>
-, <a class="el" href="utility_8c.html#ab4b5790f785b888e3136cd4e78561a63">utility.c</a>
 </li>
 <li>print_mat()
-: <a class="el" href="utility_8c.html#ac99bd580c6ac311bba4bf05405fcc6c4">utility.c</a>
-, <a class="el" href="utility_8h.html#ac99bd580c6ac311bba4bf05405fcc6c4">utility.h</a>
+: <a class="el" href="utility_8h.html#ac99bd580c6ac311bba4bf05405fcc6c4">utility.h</a>
 </li>
 <li>print_mat_lin()
-: <a class="el" href="utility_8c.html#ad3ad73efb715cca3ee55a97f7b9c4338">utility.c</a>
-, <a class="el" href="utility_8h.html#ad3ad73efb715cca3ee55a97f7b9c4338">utility.h</a>
+: <a class="el" href="utility_8h.html#ad3ad73efb715cca3ee55a97f7b9c4338">utility.h</a>
 </li>
 </ul>
 
@@ -162,19 +178,21 @@ $(function() {
 <h3><a id="index_r"></a>- r -</h3><ul>
 <li>read_matrix_from_file()
 : <a class="el" href="utility_8h.html#ad28fc5f2fa653c918916d27a160fc08b">utility.h</a>
-, <a class="el" href="utility_8c.html#ad28fc5f2fa653c918916d27a160fc08b">utility.c</a>
+</li>
+<li>read_matrix_from_file_f()
+: <a class="el" href="utility_8h.html#a7f60083877a0bc674c1aace7f3cf81dd">utility.h</a>
+</li>
+<li>read_matrix_n_from_file()
+: <a class="el" href="utility_8h.html#a853dc2c381a140dcb1a678cc10100faf">utility.h</a>
 </li>
 <li>round_mul_up()
-: <a class="el" href="ocl__boiler_8c.html#a0d5d13bff5d4521b70a1cce9c662722b">ocl_boiler.c</a>
-, <a class="el" href="ocl__boiler_8h.html#a0d5d13bff5d4521b70a1cce9c662722b">ocl_boiler.h</a>
+: <a class="el" href="ocl__boiler_8h.html#a0d5d13bff5d4521b70a1cce9c662722b">ocl_boiler.h</a>
 </li>
 <li>runtime_ms()
 : <a class="el" href="ocl__boiler_8h.html#af00ad2f1b426a0bf0fde5a5685aaf4f5">ocl_boiler.h</a>
-, <a class="el" href="ocl__boiler_8c.html#af00ad2f1b426a0bf0fde5a5685aaf4f5">ocl_boiler.c</a>
 </li>
 <li>runtime_ns()
-: <a class="el" href="ocl__boiler_8c.html#ae29c6a3df57480f1a4a7f41e6b11a100">ocl_boiler.c</a>
-, <a class="el" href="ocl__boiler_8h.html#ae29c6a3df57480f1a4a7f41e6b11a100">ocl_boiler.h</a>
+: <a class="el" href="ocl__boiler_8h.html#ae29c6a3df57480f1a4a7f41e6b11a100">ocl_boiler.h</a>
 </li>
 </ul>
 
@@ -182,27 +200,15 @@ $(function() {
 <h3><a id="index_s"></a>- s -</h3><ul>
 <li>select_device()
 : <a class="el" href="ocl__boiler_8h.html#aed444ffc95db66e511542033a107e537">ocl_boiler.h</a>
-, <a class="el" href="ocl__boiler_8c.html#aed444ffc95db66e511542033a107e537">ocl_boiler.c</a>
 </li>
 <li>select_platform()
-: <a class="el" href="ocl__boiler_8c.html#a6d628307adbd20dfd088d1cfb6b80860">ocl_boiler.c</a>
-, <a class="el" href="ocl__boiler_8h.html#a6d628307adbd20dfd088d1cfb6b80860">ocl_boiler.h</a>
+: <a class="el" href="ocl__boiler_8h.html#a6d628307adbd20dfd088d1cfb6b80860">ocl_boiler.h</a>
 </li>
-<li>START_TEST()
-: <a class="el" href="test__utility_8h.html#ad0d62eb1df6ff2e0cb8f02441bc884e8">test_utility.h</a>
-, <a class="el" href="test__gaussian__reduction_8h.html#aa189e979908dcc8d97323ee233e79f5a">test_gaussian_reduction.h</a>
-, <a class="el" href="test__utility_8h.html#aabb14b1c9e4a71918a9cb2767c4cb38f">test_utility.h</a>
-, <a class="el" href="test__ocl__boiler_8h.html#ad99b82856238d5f17a77a0bff9302e68">test_ocl_boiler.h</a>
-, <a class="el" href="test__gaussian__reduction_8h.html#a04bc6bf83e91c49e71cab84a9880751d">test_gaussian_reduction.h</a>
-, <a class="el" href="test__utility_8h.html#a62cdc522b5213b6632b9fba55ff9d0b2">test_utility.h</a>
-, <a class="el" href="test__gaussian__reduction_8h.html#a940e0b2092d1690c645ea1dfe632f2ce">test_gaussian_reduction.h</a>
-, <a class="el" href="test__ocl__boiler_8h.html#a2268965d08201a9959979d2f2378bc65">test_ocl_boiler.h</a>
-, <a class="el" href="test__gaussian__reduction_8h.html#a10f2d04b84520cdda3965d2c34c35345">test_gaussian_reduction.h</a>
-, <a class="el" href="test__utility_8h.html#a61a0b225eac58e3637f974f5ec1ca257">test_utility.h</a>
+<li>show_help_tooltip()
+: <a class="el" href="main_8h.html#a4777a78eea3f42362446731e31e94736">main.h</a>
 </li>
 <li>swap()
-: <a class="el" href="utility_8c.html#a682fe5f8505e8a50acb3c7cc459f9138">utility.c</a>
-, <a class="el" href="utility_8h.html#a682fe5f8505e8a50acb3c7cc459f9138">utility.h</a>
+: <a class="el" href="utility_8h.html#a682fe5f8505e8a50acb3c7cc459f9138">utility.h</a>
 </li>
 </ul>
 
@@ -210,18 +216,9 @@ $(function() {
 <h3><a id="index_t"></a>- t -</h3><ul>
 <li>total_runtime_ms()
 : <a class="el" href="ocl__boiler_8h.html#aa1d89daf5531e1f16509f66b1f6de6a6">ocl_boiler.h</a>
-, <a class="el" href="ocl__boiler_8c.html#aa1d89daf5531e1f16509f66b1f6de6a6">ocl_boiler.c</a>
 </li>
 <li>total_runtime_ns()
 : <a class="el" href="ocl__boiler_8h.html#a437d81f0b2fe807a08d3d511045acfbd">ocl_boiler.h</a>
-, <a class="el" href="ocl__boiler_8c.html#a437d81f0b2fe807a08d3d511045acfbd">ocl_boiler.c</a>
-</li>
-</ul>
-
-
-<h3><a id="index_u"></a>- u -</h3><ul>
-<li>utility_suite()
-: <a class="el" href="test__utility_8h.html#a2adf80420272afe1558431df0e183436">test_utility.h</a>
 </li>
 </ul>
 </div><!-- contents -->

@@ -1,7 +1,4 @@
 var searchData=
 [
-  ['gaussian_5freduction_5fno_5fpivot_85',['Gaussian_reduction_no_pivot',['../gaussian__reduction_8h.html#aaa0499f6a29cae0308c4a4b2455ca298',1,'Gaussian_reduction_no_pivot(double *A, double *b, size_t n):&#160;gaussian_reduction.c'],['../gaussian__reduction_8c.html#aaa0499f6a29cae0308c4a4b2455ca298',1,'Gaussian_reduction_no_pivot(double *A, double *b, size_t n):&#160;gaussian_reduction.c']]],
-  ['gaussian_5freduction_5fno_5fpivot_5fgpu_5fnaive_86',['Gaussian_reduction_no_pivot_gpu_naive',['../gaussian__reduction_8h.html#a7e76bc081cc06c7f76e6bf7d5706f0ed',1,'Gaussian_reduction_no_pivot_gpu_naive(double *A, double *b, size_t n, cl_status *status):&#160;gaussian_reduction.c'],['../gaussian__reduction_8c.html#a7e76bc081cc06c7f76e6bf7d5706f0ed',1,'Gaussian_reduction_no_pivot_gpu_naive(double *A, double *b, size_t n, cl_status *status):&#160;gaussian_reduction.c']]],
-  ['gaussian_5freduction_5fpivot_87',['Gaussian_reduction_pivot',['../gaussian__reduction_8h.html#a4d000ff357e1f0a8d78a210ee11fb938',1,'Gaussian_reduction_pivot(double *A, double *b, size_t n):&#160;gaussian_reduction.c'],['../gaussian__reduction_8c.html#a4d000ff357e1f0a8d78a210ee11fb938',1,'Gaussian_reduction_pivot(double *A, double *b, size_t n):&#160;gaussian_reduction.c']]],
-  ['gaussian_5freduction_5fsuite_88',['gaussian_reduction_suite',['../test__gaussian__reduction_8h.html#a2ed4dd622bbe7a684a2babc4737fb63f',1,'test_gaussian_reduction.h']]]
+  ['d_5fto_5ff_5farray_71',['d_to_f_array',['../utility_8h.html#a39827b27d23a98009db275a3e6c39004',1,'utility.c']]]
 ];
