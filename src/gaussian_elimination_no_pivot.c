@@ -716,7 +716,7 @@ double *Gaussian_elimination_no_pivot_gpu_buffer_vec(double *A, double *b, size_
     solve_evt_rn = runtime_ns(solve_evt);
     read_evt_rn = runtime_ns(read_evt);
     printf("-----\n");
-    printf("GPU no pivot buffer | n: %ld\n", n);
+    printf("GPU no pivot buffer vec 4 | n: %ld\n", n);
     printf("Gaussian_evt:\truntime %lu ns\t%.4g GE/s\t%.4g GB/s\n",
            gaussian_evt_rn, (2.0 * gaussian_wi) / gaussian_evt_rn, (2.0 * gaussian_wi * sizeof(cl_double)) / gaussian_evt_rn);
     printf("Solve_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
