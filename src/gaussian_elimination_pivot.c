@@ -57,7 +57,7 @@ double *Gaussian_elimination_pivot(double *A, double *b, size_t n)
     }
     clock_t end = clock();
     printf("-----\n");
-    printf("CPU pivot | n: %ld\n", n);
+    printf("Serial pivot | n: %ld\n", n);
     printf("Gaussian_evt:\truntime %.0f ns\n",
      (double)(end - start) / CLOCKS_PER_SEC * 1.0e9);
     printf("-----\n");
@@ -74,7 +74,7 @@ float *Gaussian_elimination_pivot_gpu_texture(float *A, float *b, size_t n, cl_s
         return NULL;
     }
     cl_int rows = n, cols = n + 1, err;
-    uint gaussian_wi = 0;
+    unsigned int gaussian_wi = 0;
     size_t U_memsize = sizeof(cl_float) * rows * cols;
     size_t x_memsize = sizeof(cl_float) * rows;
 
@@ -207,7 +207,7 @@ float *Gaussian_elimination_pivot_gpu_texture(float *A, float *b, size_t n, cl_s
     solve_evt_rn = runtime_ns(solve_evt);
     read_evt_rn = runtime_ns(read_evt);
     printf("-----\n");
-    printf("GPU partial pivot tex | n: %ld\n", n);
+    printf("OpenCL partial pivot tex | n: %ld\n", n);
     printf("Gaussian_evt:\truntime %lu ns\t%.4g GE/s\t%.4g GB/s\n",
            gaussian_evt_rn, (2.0 * gaussian_wi) / gaussian_evt_rn, (2.0 * gaussian_wi * sizeof(cl_float)) / gaussian_evt_rn);
     printf("Solve_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
@@ -236,7 +236,7 @@ float *Gaussian_elimination_pivot_gpu_texture_vec(float *A, float *b, size_t n, 
         return NULL;
     }
     cl_int rows = n, cols = (n + 1) / 4, err;
-    uint gaussian_wi = 0;
+    unsigned int gaussian_wi = 0;
     size_t U_memsize = sizeof(cl_float) * rows * cols * 4;
     size_t x_memsize = sizeof(cl_float) * rows;
 
@@ -368,7 +368,7 @@ float *Gaussian_elimination_pivot_gpu_texture_vec(float *A, float *b, size_t n, 
     solve_evt_rn = runtime_ns(solve_evt);
     read_evt_rn = runtime_ns(read_evt);
     printf("-----\n");
-    printf("GPU partial pivot tex vec 4 | n: %ld\n", n);
+    printf("OpenCL partial pivot tex vec 4 | n: %ld\n", n);
     printf("Gaussian_evt:\truntime %lu ns\t%.4g GE/s\t%.4g GB/s\n",
            gaussian_evt_rn, (8.0 * gaussian_wi) / gaussian_evt_rn, (8.0 * gaussian_wi * sizeof(cl_float)) / gaussian_evt_rn);
     printf("Solve_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
@@ -392,7 +392,7 @@ double *Gaussian_elimination_pivot_gpu_buffer(double *A, double *b, size_t n, cl
         return NULL;
     }
     cl_int rows = n, cols = n + 1, err;
-    uint gaussian_wi = 0;
+    unsigned int gaussian_wi = 0;
     size_t U_memsize = sizeof(cl_double) * rows * cols;
     size_t x_memsize = sizeof(cl_double) * rows;
 
@@ -514,7 +514,7 @@ double *Gaussian_elimination_pivot_gpu_buffer(double *A, double *b, size_t n, cl
     solve_evt_rn = runtime_ns(solve_evt);
     read_evt_rn = runtime_ns(read_evt);
     printf("-----\n");
-    printf("GPU partial pivot buffer | n: %ld\n", n);
+    printf("OpenCL partial pivot buffer | n: %ld\n", n);
     printf("Gaussian_evt:\truntime %lu ns\t%.4g GE/s\t%.4g GB/s\n",
            gaussian_evt_rn, (2.0 * gaussian_wi) / gaussian_evt_rn, (2.0 * gaussian_wi * sizeof(cl_double)) / gaussian_evt_rn);
     printf("Solve_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
@@ -543,7 +543,7 @@ double *Gaussian_elimination_pivot_gpu_buffer_vec(double *A, double *b, size_t n
         return NULL;
     }
     cl_int rows = n, cols = n + 1, err;
-    uint gaussian_wi = 0;
+    unsigned int gaussian_wi = 0;
     size_t U_memsize = sizeof(cl_double) * rows * cols;
     size_t x_memsize = sizeof(cl_double) * rows;
 
@@ -667,7 +667,7 @@ double *Gaussian_elimination_pivot_gpu_buffer_vec(double *A, double *b, size_t n
     solve_evt_rn = runtime_ns(solve_evt);
     read_evt_rn = runtime_ns(read_evt);
     printf("-----\n");
-    printf("GPU partial pivot buffer vec 4 | n: %ld\n", n);
+    printf("OpenCL partial pivot buffer vec 4 | n: %ld\n", n);
     printf("Gaussian_evt:\truntime %lu ns\t%.4g GE/s\t%.4g GB/s\n",
            gaussian_evt_rn, (2.0 * gaussian_wi) / gaussian_evt_rn, (2.0 * gaussian_wi * sizeof(cl_double)) / gaussian_evt_rn);
     printf("Solve_evt:\truntime %lu ns  \t%.4g GE/s\t%.4g GB/s\n",
