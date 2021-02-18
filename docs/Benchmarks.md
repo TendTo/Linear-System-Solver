@@ -4,32 +4,58 @@ The following are the mean value found by running the specified implementation m
 
 Times are expressed in milliseconds.
 
-**Matrix size:** 1023 X 1024, for a total of 1047552 elements
+### **Matrix size:** 1023 X 1024, for a total of 1047552 elements
+
+| (serial) Intel i5-7600 CPU @ 3.50GHz | Gaussian elimination kernel | Solution vector kernel | TOT |
+| - | - | - | - |
+| No pivot | / | / | 940.37 |
+| Parital pivot | / | / | 1007.63 |
+
+| (pocl) Intel i5-7600 CPU @ 3.50GHz | Gaussian elimination kernel | Solution vector kernel | TOT |
+| - | - | - | - |
+| No pivot texture vec 4 | 1363.69 | 23.95 | 1387,64 |
+| No pivot buffer | 357.83 | 17.42 | 375,25 |
+| Partial pivot texture vec 4 | 3002.90 | 23.81 | 3026,71 |
+| Partial pivot buffer | 3546.58 | 18.58 | 3565,16 |
 
 | Nvidia GeForce GTX 1060 3GB | Gaussian elimination kernel | Solution vector kernel | TOT |
 | - | - | - | - |
-| No pivot CPU |  |  | 940.37 |
 | No pivot texture | 46.25 | 2.31 | 48.56 |
 | No pivot texture vec 4 | 26.95 | 2.28 | 29.23 |
 | No pivot buffer | 58.13 | 3.65 | 61.78 |
 | No pivot buffer vec 4 | 39.36 | 3.91 | 43.27 |
-| Parital pivot CPU |  |  | 1007.63 |
 | Partial pivot texture | 188.69 | 4.19 | 190.5 |
 | Partial pivot texture vec 4 | 45.86 | 4.77 | 50,63 |
 | Partial pivot buffer | 408.19 | 5.24 | 413.43 |
 | Partial pivot buffer vec 4 | 67.01 | 5.14 | 72,15 |
 
-**Matrix size:** 2047 X 2048, for a total of 4192256 elements
+---
+
+### **Matrix size:** 2047 X 2048, for a total of 4192256 elements
+
+| (serial) Intel i5-7600 CPU @ 3.50GHz | Gaussian elimination kernel | Solution vector kernel | TOT |
+| - | - | - | - |
+| No pivot | / | / | 7462.43 |
+| Parital pivot | / | / | 7442.95 |
+
+| (pocl) Intel i5-7600 CPU @ 3.50GHz | Gaussian elimination kernel | Solution vector kernel | TOT |
+| - | - | - | - |
+| No pivot texture vec 4 | 8748.75 | 139.74 | 8888.49 |
+| No pivot buffer | 2891.91 | 96.99 | 2988.90 |
+| Partial pivot texture vec 4 | 30451.27 | 137.12 | 30588.39 |
+| Partial pivot buffer | 44296.28 | 100.44 | 44396.72 |
 
 | Nvidia GeForce GTX 1060 3GB | Gaussian elimination kernel | Solution vector kernel | TOT |
 | - | - | - | - |
-| No pivot CPU |  |  | 7462.43 |
 | No pivot texture | 303.44 | 9.10 | 330,39 |
 | No pivot texture vec 4 | 171.56 | 10.33 | 181,89 |
 | No pivot buffer | 390.51 | 10.54 | 401,05 |
 | No pivot buffer vec 4 | 296.29 | 10.74 | 307,03 |
-| Parital pivot CPU |  |  | 7442.95 |
 | Partial pivot texture | 2421.75 | 8.87 | 2430,62 |
 | Partial pivot texture vec 4 | 365.82 | 9.23 | 355,05 |
 | Partial pivot buffer | 6082.43 | 9.98 | 6092,41 |
 | Partial pivot buffer vec 4 | 705.32 | 9.89 | 715,21 |
+
+---
+
+[Back to table of contents](Table-of-contents.md)
