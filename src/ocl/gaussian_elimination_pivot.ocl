@@ -445,32 +445,23 @@ kernel void gaussian_elimination_pivot_buffer(int rows, int cols, int pivot, glo
   }
 }
 
-kernel void gaussian_elimination_pivot_buffer_vec(int rows, int cols, int pivot, global double4 *restrict in_U,
+kernel void gaussian_elimination_pivot_buffer_vec(int rows, int cols_quarts, int pivot, global double4 *restrict in_U,
                                               global double4 *restrict out_U, local double *restrict lmem,
                                               local uint *restrict i_lmem) {
+  global const double read_only *s_in_U = in_U;
+  global double write_only *s_out_U = out_U;
+
   const int pivot_quarts = pivot / 4;
   const int col = get_global_id(0) + pivot / 4;
   const int row = get_global_id(1) + pivot + 1;
+  const int cols = cols_quarts * 4;
 
   const int li = get_local_id(1) * get_local_size(0) + get_local_id(0);
   const int n_li = get_local_size(0) * get_local_size(1);
 
   // Fill the local memory
   for (int i = li; pivot + i < rows; i += n_li) {
-    switch (pivot & 3) {
-    case 0:
-      lmem[i] = fabs(in_U[(pivot + i) * cols + pivot_quarts]).s0;
-      break;
-    case 1:
-      lmem[i] = fabs(in_U[(pivot + i) * cols + pivot_quarts]).s1;
-      break;
-    case 2:
-      lmem[i] = fabs(in_U[(pivot + i) * cols + pivot_quarts]).s2;
-      break;
-    case 3:
-      lmem[i] = fabs(in_U[(pivot + i) * cols + pivot_quarts]).s3;
-      break;
-    }
+    lmem[i] = fabs(s_in_U[(pivot + i) * cols + pivot]);
     i_lmem[i] = i + pivot;
   }
   barrier(CLK_LOCAL_MEM_FENCE);
@@ -505,68 +496,52 @@ kernel void gaussian_elimination_pivot_buffer_vec(int rows, int cols, int pivot,
   }
   int pivot_row = i_lmem[0];
 
-  if (col >= cols || row >= rows)
+  if (col >= cols_quarts || row >= rows)
     return;
 
-  double4 old_val, head_row_val4;
-  double4 pivot_val4 = in_U[pivot_row * cols + pivot_quarts];
+  double4 old_val;
+  double head_row_val;
   if (row != pivot_row) {
-    head_row_val4 = in_U[row * cols + pivot_quarts];
-    old_val = in_U[row * cols + col];
+    head_row_val = s_in_U[row * cols + pivot];
+    old_val = in_U[row * cols_quarts + col];
   } else {
-    head_row_val4 = in_U[pivot * cols + pivot_quarts];
-    old_val = in_U[pivot * cols + col];
+    head_row_val = s_in_U[pivot * cols + pivot];
+    old_val = in_U[pivot * cols_quarts + col];
   }
-  double pivot_val, head_row_val;
-  switch (pivot & 3) {
-  case 0:
-    pivot_val = pivot_val4.s0;
-    head_row_val = head_row_val4.s0;
-    break;
-  case 1:
-    pivot_val = pivot_val4.s1;
-    head_row_val = head_row_val4.s1;
-    break;
-  case 2:
-    pivot_val = pivot_val4.s2;
-    head_row_val = head_row_val4.s2;
-    break;
-  case 3:
-    pivot_val = pivot_val4.s3;
-    head_row_val = head_row_val4.s3;
-    break;
-  }
+  double pivot_val = s_in_U[pivot_row * cols + pivot];
   double mult = -head_row_val / pivot_val;
 
-  double4 pivot_row_val = in_U[pivot_row * cols + col];
+  double4 pivot_row_val = in_U[pivot_row * cols_quarts + col];
   double4 new_val = old_val + pivot_row_val * (double4)(mult);
-  out_U[row * cols + col] = new_val;
+  out_U[row * cols_quarts + col] = new_val;
 
   // Copy the pivot row on the output
   if (row == pivot + 1) {
-    out_U[pivot * cols + col] = pivot_row_val;
+    out_U[pivot * cols_quarts + col] = pivot_row_val;
     if (col == pivot + 1)
-      out_U[pivot * cols + pivot_quarts] = pivot_val4;
+      s_out_U[pivot * cols + pivot] = pivot_val;
   }
 }
 
 kernel void gaussian_elimination_solve_buffer(int rows, int cols, global double *restrict even_U,
                                               global double *restrict odd_U, global double *restrict x,
                                               local double *restrict lmem) {
+  global double read_only *in_U;
+
   const int li = get_local_id(0);
   const int n_li = get_local_size(0);
   const int rows_li = ((rows + n_li - 1) / n_li) * n_li;
 
   for (int row = rows - 1; row >= 0; --row) {
+    if (row != rows - 1)
+      in_U = (row & 1) ? odd_U : even_U;
+    else
+      in_U = (row & 1) ? even_U : odd_U;
     
     // Fill the local memory
     for (int col = li; col < rows_li; col += n_li) {
       if (col > row && col < rows) {
-        float coefficient;
-        if (row != rows - 1)
-          coefficient = (row & 1) ? odd_U[row * cols + col] : even_U[row * cols + col];
-        else
-          coefficient = (row & 1) ? even_U[row * cols + col] : odd_U[row * cols + col];
+        double coefficient = in_U[row * cols + col];
         lmem[col] = lmem[rows + col] * coefficient;
       }
     }
@@ -591,15 +566,8 @@ kernel void gaussian_elimination_solve_buffer(int rows, int cols, global double 
     // The wi-row calculates the sum and writes the result
     for (int col = li; col < rows_li; col += n_li) {
       if (col == row) {
-        float coefficient;
-        float sum;
-        if (row != rows - 1) {
-          coefficient = (row & 1) ? odd_U[row * cols + col] : even_U[row * cols + col];
-          sum = (row & 1) ? odd_U[row * cols + rows] : even_U[row * cols + rows];
-        } else {
-          coefficient = (row & 1) ? even_U[row * cols + col] : odd_U[row * cols + col];
-          sum = (row & 1) ? even_U[row * cols + rows] : odd_U[row * cols + rows];
-        }
+        double coefficient = in_U[row * cols + col];
+        double sum = in_U[row * cols + rows];
         lmem[rows + col] = (sum - lmem[row + 1]) / coefficient;
         const int group_id = get_group_id(0);
       }

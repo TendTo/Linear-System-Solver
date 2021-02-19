@@ -28,7 +28,7 @@ The speedup refers to the corrisponding serial implementation.
 | Partial pivot texture | 188.69 | 4.19 | 190.5 | x5.3 |
 | Partial pivot texture vec 4 | 45.86 | 4.77 | 50.63 | x19.9 |
 | Partial pivot buffer | 408.19 | 5.24 | 413.43 | x2.4 |
-| Partial pivot buffer vec 4 | 67.01 | 5.14 | 72.15 | x13.9 |
+| Partial pivot buffer vec 4 | 60.01 | 5.14 | 65.15 | x15.5 |
 
 ---
 
@@ -54,8 +54,8 @@ The speedup refers to the corrisponding serial implementation.
 | No pivot buffer vec 4 | 296.29 | 10.74 | 307.03 | x24.3 |
 | Partial pivot texture | 2421.75 | 8.87 | 2430.62 | x3.1 |
 | Partial pivot texture vec 4 | 365.82 | 9.23 | 355.05 | x21.0 |
-| Partial pivot buffer | 6082.43 | 9.98 | 6092.41 | x1.2 |
-| Partial pivot buffer vec 4 | 705.32 | 9.89 | 715.21 | x10.4 |
+| Partial pivot buffer | 6082.43 | 10.48 | 6092.91 | x1.2 |
+| Partial pivot buffer vec 4 | 702.32 | 10.39 | 712.71 | x10.4 |
 
 ---
 

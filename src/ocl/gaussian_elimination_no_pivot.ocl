@@ -228,8 +228,8 @@ kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, i
     for (int col = li; col < rows_li; col += n_li) {
       if (col > row && col < rows) {
         const int col_quarts = col / 4;
-        float4 coefficient4 =
-            (row & 1) ? read_imagef(odd_U, s, (int2)(col_quarts, row)) : read_imagef(even_U, s, (int2)(col_quarts, row));
+        float4 coefficient4 = (row & 1) ? read_imagef(odd_U, s, (int2)(col_quarts, row))
+                                        : read_imagef(even_U, s, (int2)(col_quarts, row));
         float coefficient;
         switch (col & 3) {
         case 0:
@@ -317,57 +317,44 @@ kernel void gaussian_elimination_no_pivot_buffer(int rows, int cols, int pivot, 
   out_U[row * cols + col] = new_val;
 }
 
-kernel void gaussian_elimination_no_pivot_buffer_vec(int rows, int cols, int pivot, global double4 *restrict in_U,
-                                                     global double4 *restrict out_U) {
+kernel void gaussian_elimination_no_pivot_buffer_vec(int rows, int cols_quarts, int pivot,
+                                                     global double4 *restrict in_U, global double4 *restrict out_U) {
+  global const double read_only *s_in_U = in_U;
+
   const int pivot_quarts = pivot / 4;
   const int col = get_global_id(0) + pivot / 4;
   const int row = get_global_id(1) + pivot + 1;
+  const int cols = cols_quarts * 4;
 
-  if (col >= cols || row >= rows)
+  if (col >= cols_quarts || row >= rows)
     return;
 
-  double4 pivot_val4 = in_U[pivot * cols + pivot_quarts];
-  double4 head_row_val4 = in_U[row * cols + pivot_quarts];
-  double pivot_val, head_row_val;
-  switch (pivot & 3) {
-  case 0:
-    pivot_val = pivot_val4.s0;
-    head_row_val = head_row_val4.s0;
-    break;
-  case 1:
-    pivot_val = pivot_val4.s1;
-    head_row_val = head_row_val4.s1;
-    break;
-  case 2:
-    pivot_val = pivot_val4.s2;
-    head_row_val = head_row_val4.s2;
-    break;
-  case 3:
-    pivot_val = pivot_val4.s3;
-    head_row_val = head_row_val4.s3;
-    break;
-  }
+  double pivot_val = s_in_U[pivot * cols + pivot];
+  double head_row_val = s_in_U[row * cols + pivot];
   double mult = -head_row_val / pivot_val;
 
-  double4 pivot_row_val = in_U[pivot * cols + col];
-  double4 old_val = in_U[row * cols + col];
+  double4 pivot_row_val = in_U[pivot * cols_quarts + col];
+  double4 old_val = in_U[row * cols_quarts + col];
   double4 new_val = old_val + pivot_row_val * (double4)(mult);
-  out_U[row * cols + col] = new_val;
+  out_U[row * cols_quarts + col] = new_val;
 }
 
-kernel void gaussian_elimination_solve_buffer(int rows, int cols, global double *restrict even_U,
-                                              global double *restrict odd_U, global double *restrict x,
-                                              local double *restrict lmem) {
+kernel void gaussian_elimination_solve_buffer(int rows, int cols, global double read_only *restrict even_U,
+                                              global double read_only *restrict odd_U,
+                                              global write_only double *restrict x, local double *restrict lmem) {
+  global double read_only *in_U;
+
   const int li = get_local_id(0);
   const int n_li = get_local_size(0);
   const int rows_li = ((rows + n_li - 1) / n_li) * n_li;
 
   for (int row = rows - 1; row >= 0; --row) {
+    in_U = (row & 1) ? odd_U : even_U;
 
     // Fill the local memory
     for (int col = li; col < rows_li; col += n_li) {
       if (col > row && col < rows) {
-        float coefficient = (row & 1) ? odd_U[row * cols + col] : even_U[row * cols + col];
+        double coefficient = in_U[row * cols + col];
         lmem[col] = lmem[rows + col] * coefficient;
       }
     }
@@ -392,8 +379,8 @@ kernel void gaussian_elimination_solve_buffer(int rows, int cols, global double 
     // The wi-row calculates the sum and writes the result
     for (int col = li; col < rows_li; col += n_li) {
       if (col == row) {
-        float coefficient = (row & 1) ? odd_U[row * cols + col] : even_U[row * cols + col];
-        float sum = (row & 1) ? odd_U[row * cols + rows] : even_U[row * cols + rows];
+        double coefficient = in_U[row * cols + col];
+        double sum = in_U[row * cols + rows];
         sum -= lmem[row + 1];
         lmem[rows + col] = sum / coefficient;
       }
