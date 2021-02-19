@@ -221,9 +221,14 @@ finally, the row-th unknown is calculated, retrieving the needed values from the
 <td>
 
 ```c
+//Used to access single values in the buffers
+global read_only const double *s_in_U = in_U;
+global write_only double *s_out_U = out_U;
+
 const int pivot_quarts = pivot / 4;
 const int col = get_global_id(0) + pivot / 4;
 const int row = get_global_id(1) + pivot + 1;
+const int cols = cols_quarts * 4;
 
 const int li = get_local_id(1) * get_local_size(0) + get_local_id(0);
 const int n_li = get_local_size(0) * get_local_size(1);
@@ -245,23 +250,7 @@ The pivot's value, on the other hand, starst at 0 and increases by one each time
 ```c
 //Sliding window
 for (int i = li; pivot + i < rows; i += n_li) {
-  //Based on the pivot column, choose the correct value among the four
-  //to store in the local memory
-  switch (pivot & 3) {
-  case 0:
-    lmem[i] = fabs(in_U[(pivot + i) * cols + pivot_quarts]).s0;
-    break;
-  case 1:
-    lmem[i] = fabs(in_U[(pivot + i) * cols + pivot_quarts]).s1;
-    break;
-  case 2:
-    lmem[i] = fabs(in_U[(pivot + i) * cols + pivot_quarts]).s2;
-    break;
-  case 3:
-    lmem[i] = fabs(in_U[(pivot + i) * cols + pivot_quarts]).s3;
-    break;
-  }
-  //Index array
+  lmem[i] = fabs(s_in_U[(pivot + i) * cols + pivot]);
   i_lmem[i] = i + pivot;
 }
 barrier(CLK_LOCAL_MEM_FENCE);
@@ -334,47 +323,30 @@ In the case that the number of elements to check was not even, the last element 
 
 ```c
 //Read the vectorized values
-double4 old_val, head_row_val4;
-double4 pivot_val4 = in_U[pivot_row * cols + pivot_quarts];
+double4 old_val;
+double head_row_val;
+//The work-items in the row of the pivot_row calculate the
+//simplified row of index pivot instead
 if (row != pivot_row) {
-  head_row_val4 = in_U[row * cols + pivot_quarts];
-  old_val = in_U[row * cols + col];
+  head_row_val = s_in_U[row * cols + pivot];
+  old_val = in_U[row * cols_quarts + col];
 } else {
-  head_row_val4 = in_U[pivot * cols + pivot_quarts];
-  old_val = in_U[pivot * cols + col];
+  head_row_val = s_in_U[pivot * cols + pivot];
+  old_val = in_U[pivot * cols_quarts + col];
 }
-//Assign the non vectorized value according to the pivot
-double pivot_val, head_row_val;
-switch (pivot & 3) {
-case 0:
-  pivot_val = pivot_val4.s0;
-  head_row_val = head_row_val4.s0;
-  break;
-case 1:
-  pivot_val = pivot_val4.s1;
-  head_row_val = head_row_val4.s1;
-  break;
-case 2:
-  pivot_val = pivot_val4.s2;
-  head_row_val = head_row_val4.s2;
-  break;
-case 3:
-  pivot_val = pivot_val4.s3;
-  head_row_val = head_row_val4.s3;
-  break;
-}
+double pivot_val = s_in_U[pivot_row * cols + pivot];
 double mult = -head_row_val / pivot_val;
-double4 pivot_row_val = in_U[pivot_row * cols + col];
+
+double4 pivot_row_val = in_U[pivot_row * cols_quarts + col];
 double4 new_val = old_val + pivot_row_val * (double4)(mult);
-out_U[row * cols + col] = new_val;
-// Copy the pivot row on the output
+out_U[row * cols_quarts + col] = new_val;
+
+//Copy the pivot row on the output
 if (row == pivot + 1) {
-  out_U[pivot * cols + col] = pivot_row_val;
+  out_U[pivot * cols_quarts + col] = pivot_row_val;
   if (col == pivot + 1)
-    out_U[pivot * cols + pivot_quarts] = pivot_val4;
+    s_out_U[pivot * cols + pivot] = pivot_val;
 }
-//Retrieve the index of the best pivot
-int pivot_row = i_lmem[0];
 ```
 
 </td>
