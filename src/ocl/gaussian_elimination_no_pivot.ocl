@@ -299,8 +299,8 @@ kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, i
     x[get_global_id(0)] = lmem[rows + get_global_id(0)];
 }
 
-kernel void gaussian_elimination_no_pivot_buffer(int rows, int cols, int pivot, global double *restrict in_U,
-                                                 global double *restrict out_U) {
+kernel void gaussian_elimination_no_pivot_buffer(int rows, int cols, int pivot, global read_only double *restrict in_U,
+                                                 global write_only double *restrict out_U) {
   const int col = get_global_id(0) + pivot + 1;
   const int row = get_global_id(1) + pivot + 1;
 
@@ -318,8 +318,9 @@ kernel void gaussian_elimination_no_pivot_buffer(int rows, int cols, int pivot, 
 }
 
 kernel void gaussian_elimination_no_pivot_buffer_vec(int rows, int cols_quarts, int pivot,
-                                                     global double4 *restrict in_U, global double4 *restrict out_U) {
-  global const double read_only *s_in_U = in_U;
+                                                     global read_only double4 *restrict in_U,
+                                                     global write_only double4 *restrict out_U) {
+  global read_only const double *s_in_U = in_U;
 
   const int pivot_quarts = pivot / 4;
   const int col = get_global_id(0) + pivot / 4;
@@ -339,10 +340,10 @@ kernel void gaussian_elimination_no_pivot_buffer_vec(int rows, int cols_quarts, 
   out_U[row * cols_quarts + col] = new_val;
 }
 
-kernel void gaussian_elimination_solve_buffer(int rows, int cols, global double read_only *restrict even_U,
-                                              global double read_only *restrict odd_U,
+kernel void gaussian_elimination_solve_buffer(int rows, int cols, global read_only double *restrict even_U,
+                                              global read_only double *restrict odd_U,
                                               global write_only double *restrict x, local double *restrict lmem) {
-  global double read_only *in_U;
+  global read_only double *in_U;
 
   const int li = get_local_id(0);
   const int n_li = get_local_size(0);
