@@ -9,7 +9,16 @@ The **lmem** implementation will not be shown since it is the simplest one. It w
 - **Memory object ping-pong:** since each iteration of the Gaussian elimination algorithm depens on the iteration before, data needs to be shynchronized.   
 To achieve this even for very large matrices, the solution is to use two memory objects that will be swapped at each iteration. One will provide the input, the other will store the output.  
 This also means that all the fully reduced even rows will be on one memory objects, while the odd ones will be on the other.  
+The reason is that in the elimination phase only one of the two mem-obj is used to write only the lines that have been modified, and then the two are inverted in the next.  
+Let's put ourselves in the case with no pivot for simplicity, and call j1 the first mem-obj, which currently contains the entire matrix, and j2 the second, which contains nothing.  
+At the end of the first iteration, only a submatrix is ​​written to j2, which contains one row and one column less than the original matrix and which starts from index (1,1). The pivot row is excluded.  
+At the end of the second iteration, a submatrix with two fewer rows and columns than the original one will be overwritten on j1, starting from index (2,2), leaving out the new pivot row, index 1. And so on.  
+Since the rows that make up the matrix in echelon form are precisely the various pivot rows found in the previous steps, it follows that the "final" rows will be found only on j1 ​​or j2, depending on whether they were even or odd.  
 An exeption to this rules occurs in the **partial pivot** versions, since there two rows are carried over to the output memory object, meaning that the final row will be on the same location as the previous row.
+
+- **Local memory size in solve kernels:** in the solve kernels, the local memory is actually divided into two "logical" sections, and the offset between one and the other is exactly _rows_, that is the number of rows (and therefore of solutions) of the system. The first _rows_ positions are used for the reduction, the last _rows_ contain the results, as they are calculated.  
+The local memory, in total, contains _2rows_ elements.
+
 - **Sliding window:** this means that all the work-items in a work-group are able to work on a vector that has more elements than the numer of work-items in the work-group.  
 The method to achieve this is simple: let us assume say the local work size is **n** and the number of elements to elaborate is **l * n**.  
 With the sliding window, the first **n** elements are evaluated, and then the next **n** and so on, **l** times.  
