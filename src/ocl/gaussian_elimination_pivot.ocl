@@ -111,7 +111,7 @@ kernel void gaussian_elimination_solve_texture(image2d_t read_only even_U, image
   const int rows_li = ((rows + n_li - 1) / n_li) * n_li;
 
   for (int row = rows - 1; row >= 0; --row) {
-    
+
     // Fill the local memory
     for (int col = li; col < rows_li; col += n_li) {
       if (col > row && col < rows) {
@@ -149,17 +149,18 @@ kernel void gaussian_elimination_solve_texture(image2d_t read_only even_U, image
         float coefficient;
         float sum;
         if (row != rows - 1) {
-          coefficient = (row & 1) ? read_imagef(odd_U, s, (int2)(col, row)).s0 
-                                  : read_imagef(even_U, s, (int2)(col, row)).s0;
+          coefficient =
+              (row & 1) ? read_imagef(odd_U, s, (int2)(col, row)).s0 : read_imagef(even_U, s, (int2)(col, row)).s0;
           sum = (row & 1) ? read_imagef(odd_U, s, (int2)(cols - 1, row)).s0
                           : read_imagef(even_U, s, (int2)(cols - 1, row)).s0;
         } else {
-          coefficient = (row & 1) ? read_imagef(even_U, s, (int2)(col, row)).s0 
-                                  : read_imagef(odd_U, s, (int2)(col, row)).s0;
+          coefficient =
+              (row & 1) ? read_imagef(even_U, s, (int2)(col, row)).s0 : read_imagef(odd_U, s, (int2)(col, row)).s0;
           sum = (row & 1) ? read_imagef(even_U, s, (int2)(cols - 1, row)).s0
                           : read_imagef(odd_U, s, (int2)(cols - 1, row)).s0;
         }
-        sum -= lmem[row + 1];
+        if (row != rows - 1)
+          sum -= lmem[row + 1];
         lmem[rows + col] = sum / coefficient;
       }
     }
@@ -285,7 +286,7 @@ kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, i
   const int rows_li = ((rows + n_li - 1) / n_li) * n_li;
 
   for (int row = rows - 1; row >= 0; --row) {
-    
+
     // Fill the local memory
     for (int col = li; col < rows_li; col += n_li) {
       if (col > row && col < rows) {
@@ -364,7 +365,8 @@ kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, i
           coefficient = coefficient4.s3;
           break;
         }
-        sum -= lmem[row + 1];
+        if (row != rows - 1)
+          sum -= lmem[row + 1];
         lmem[rows + col] = sum / coefficient;
       }
     }
@@ -374,8 +376,8 @@ kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, i
     x[get_global_id(0)] = lmem[rows + get_global_id(0)];
 }
 
-kernel void gaussian_elimination_pivot_buffer(int rows, int cols, int pivot, global read_only double *restrict in_U,
-                                              global write_only double *restrict out_U, local double *restrict lmem,
+kernel void gaussian_elimination_pivot_buffer(int rows, int cols, int pivot, global double *restrict in_U,
+                                              global double *restrict out_U, local double *restrict lmem,
                                               local uint *restrict i_lmem) {
   const int col = get_global_id(0) + pivot + 1;
   const int row = get_global_id(1) + pivot + 1;
@@ -446,11 +448,11 @@ kernel void gaussian_elimination_pivot_buffer(int rows, int cols, int pivot, glo
 }
 
 kernel void gaussian_elimination_pivot_buffer_vec(int rows, int cols_quarts, int pivot,
-                                                  global read_only double4 *restrict in_U,
-                                                  global write_only double4 *restrict out_U,
+                                                  global double4 *restrict in_U,
+                                                  global double4 *restrict out_U,
                                                   local double *restrict lmem, local uint *restrict i_lmem) {
-  global read_only const double *s_in_U = in_U;
-  global write_only double *s_out_U = out_U;
+  global const double *s_in_U = in_U;
+  global double *s_out_U = out_U;
 
   const int pivot_quarts = pivot / 4;
   const int col = get_global_id(0) + pivot / 4;
@@ -524,10 +526,10 @@ kernel void gaussian_elimination_pivot_buffer_vec(int rows, int cols_quarts, int
   }
 }
 
-kernel void gaussian_elimination_solve_buffer(int rows, int cols, global read_only double *restrict even_U,
-                                              global read_only double *restrict odd_U,
-                                              global write_only double *restrict x, local double *restrict lmem) {
-  global read_only double *in_U;
+kernel void gaussian_elimination_solve_buffer(int rows, int cols, global double *restrict even_U,
+                                              global double *restrict odd_U,
+                                              global double *restrict x, local double *restrict lmem) {
+  global double *in_U;
 
   const int li = get_local_id(0);
   const int n_li = get_local_size(0);
@@ -538,7 +540,7 @@ kernel void gaussian_elimination_solve_buffer(int rows, int cols, global read_on
       in_U = (row & 1) ? odd_U : even_U;
     else
       in_U = (row & 1) ? even_U : odd_U;
-    
+
     // Fill the local memory
     for (int col = li; col < rows_li; col += n_li) {
       if (col > row && col < rows) {
@@ -569,7 +571,9 @@ kernel void gaussian_elimination_solve_buffer(int rows, int cols, global read_on
       if (col == row) {
         double coefficient = in_U[row * cols + col];
         double sum = in_U[row * cols + rows];
-        lmem[rows + col] = (sum - lmem[row + 1]) / coefficient;
+        if (row != rows - 1)
+          sum -= lmem[row + 1];
+        lmem[rows + col] = sum / coefficient;
         const int group_id = get_group_id(0);
       }
     }
