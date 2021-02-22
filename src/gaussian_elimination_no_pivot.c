@@ -224,14 +224,12 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
     lws[0] = rows < 64 ? rows : rows / 4;
     gws[0] = lws[0];
 
-    err = clSetKernelArg(solve_k, 0, sizeof(d_even_U), &d_even_U);
+    err = clSetKernelArg(solve_k, 0, sizeof(d_in_U), &d_in_U);
     ocl_check(err, "set arg 0 for solve_k");
-    err = clSetKernelArg(solve_k, 1, sizeof(d_odd_U), &d_odd_U);
+    err = clSetKernelArg(solve_k, 1, sizeof(d_x), &d_x);
     ocl_check(err, "set arg 1 for solve_k");
-    err = clSetKernelArg(solve_k, 2, sizeof(d_x), &d_x);
+    err = clSetKernelArg(solve_k, 2, x_memsize * 2, NULL);
     ocl_check(err, "set arg 2 for solve_k");
-    err = clSetKernelArg(solve_k, 3, x_memsize * 2, NULL);
-    ocl_check(err, "set arg 3 for solve_k");
 
     err = clEnqueueNDRangeKernel(status->que, solve_k,
                                  1, NULL, gws, lws,
@@ -381,14 +379,12 @@ float *Gaussian_elimination_no_pivot_gpu_texture_vec(float *A, float *b, size_t 
     lws[0] = rows < 64 ? rows : rows / 4;
      gws[0] = lws[0];
 
-    err = clSetKernelArg(solve_k, 0, sizeof(d_even_U), &d_even_U);
+    err = clSetKernelArg(solve_k, 0, sizeof(d_in_U), &d_in_U);
     ocl_check(err, "set arg 0 for solve_k");
-    err = clSetKernelArg(solve_k, 1, sizeof(d_odd_U), &d_odd_U);
+    err = clSetKernelArg(solve_k, 1, sizeof(d_x), &d_x);
     ocl_check(err, "set arg 1 for solve_k");
-    err = clSetKernelArg(solve_k, 2, sizeof(d_x), &d_x);
+    err = clSetKernelArg(solve_k, 2, x_memsize * 2, NULL);
     ocl_check(err, "set arg 2 for solve_k");
-    err = clSetKernelArg(solve_k, 3, x_memsize * 2, NULL);
-    ocl_check(err, "set arg 3 for solve_k");
 
     err = clEnqueueNDRangeKernel(status->que, solve_k,
                                  1, NULL, gws, lws,
@@ -522,14 +518,12 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
     ocl_check(err, "set arg 0 for solve_k");
     err = clSetKernelArg(solve_k, 1, sizeof(cl_int), &cols);
     ocl_check(err, "set arg 1 for solve_k");
-    err = clSetKernelArg(solve_k, 2, sizeof(d_even_U), &d_even_U);
+    err = clSetKernelArg(solve_k, 2, sizeof(d_in_U), &d_in_U);
     ocl_check(err, "set arg 2 for solve_k");
-    err = clSetKernelArg(solve_k, 3, sizeof(d_odd_U), &d_odd_U);
+    err = clSetKernelArg(solve_k, 3, sizeof(d_x), &d_x);
     ocl_check(err, "set arg 3 for solve_k");
-    err = clSetKernelArg(solve_k, 4, sizeof(d_x), &d_x);
+    err = clSetKernelArg(solve_k, 4, x_memsize * 2, NULL);
     ocl_check(err, "set arg 4 for solve_k");
-    err = clSetKernelArg(solve_k, 5, x_memsize * 2, NULL);
-    ocl_check(err, "set arg 5 for solve_k");
 
     err = clEnqueueNDRangeKernel(status->que, solve_k,
                                  1, NULL, gws, lws,
@@ -670,14 +664,12 @@ double *Gaussian_elimination_no_pivot_gpu_buffer_vec(double *A, double *b, size_
     ocl_check(err, "set arg 0 for solve_k");
     err = clSetKernelArg(solve_k, 1, sizeof(cl_int), &cols);
     ocl_check(err, "set arg 1 for solve_k");
-    err = clSetKernelArg(solve_k, 2, sizeof(d_even_U), &d_even_U);
+    err = clSetKernelArg(solve_k, 2, sizeof(d_in_U), &d_in_U);
     ocl_check(err, "set arg 2 for solve_k");
-    err = clSetKernelArg(solve_k, 3, sizeof(d_odd_U), &d_odd_U);
+    err = clSetKernelArg(solve_k, 3, sizeof(d_x), &d_x);
     ocl_check(err, "set arg 3 for solve_k");
-    err = clSetKernelArg(solve_k, 4, sizeof(d_x), &d_x);
+    err = clSetKernelArg(solve_k, 4, x_memsize * 2, NULL);
     ocl_check(err, "set arg 4 for solve_k");
-    err = clSetKernelArg(solve_k, 5, x_memsize * 2, NULL);
-    ocl_check(err, "set arg 5 for solve_k");
 
     err = clEnqueueNDRangeKernel(status->que, solve_k,
                                  1, NULL, gws, lws,
