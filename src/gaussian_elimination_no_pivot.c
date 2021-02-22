@@ -61,7 +61,7 @@ double *Gaussian_elimination_no_pivot_gpu_lmem(double *A, double *b, size_t n, c
         h_U = A;
 
     //Transfer complete matrix to device
-    cl_mem d_U = clCreateBuffer(status->ctx, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, U_memsize, h_U, &err);
+    cl_mem d_U = clCreateBuffer(status->ctx, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, U_memsize, h_U, &err);
     ocl_check(err, "create input buffer");
     cl_mem d_x = clCreateBuffer(status->ctx, CL_MEM_WRITE_ONLY, x_memsize, NULL, &err);
     ocl_check(err, "create output buffer");
@@ -462,7 +462,7 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
         h_U = A;
 
     //Create memory objects
-    cl_mem d_even_U = clCreateBuffer(status->ctx, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, U_memsize, h_U, &err);
+    cl_mem d_even_U = clCreateBuffer(status->ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, U_memsize, h_U, &err);
     ocl_check(err, "create even buffer");
     cl_mem d_odd_U = clCreateBuffer(status->ctx, CL_MEM_READ_WRITE, U_memsize, NULL, &err);
     ocl_check(err, "create odd buffer");
@@ -608,7 +608,7 @@ double *Gaussian_elimination_no_pivot_gpu_buffer_vec(double *A, double *b, size_
         h_U = A;
 
     //Create memory objects
-    cl_mem d_even_U = clCreateBuffer(status->ctx, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, U_memsize, h_U, &err);
+    cl_mem d_even_U = clCreateBuffer(status->ctx, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, U_memsize, h_U, &err);
     ocl_check(err, "create even buffer");
     cl_mem d_odd_U = clCreateBuffer(status->ctx, CL_MEM_READ_WRITE, U_memsize, NULL, &err);
     ocl_check(err, "create odd buffer");
