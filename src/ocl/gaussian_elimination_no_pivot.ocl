@@ -171,8 +171,9 @@ kernel void gaussian_elimination_solve_texture(image2d_t read_only even_U, image
     }
     barrier(CLK_LOCAL_MEM_FENCE);
   }
-  if (get_global_id(0) < rows)
-    x[get_global_id(0)] = lmem[rows + get_global_id(0)];
+  for (int row = li; row < rows_li; row += n_li)
+    if(row < rows)
+      x[row] = lmem[rows + row];
 }
 
 kernel void gaussian_elimination_no_pivot_texture_vec(int pivot, image2d_t read_only in_U, image2d_t write_only out_U) {
@@ -298,8 +299,9 @@ kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, i
     }
     barrier(CLK_LOCAL_MEM_FENCE);
   }
-  if (get_global_id(0) < rows)
-    x[get_global_id(0)] = lmem[rows + get_global_id(0)];
+  for (int row = li; row < rows_li; row += n_li)
+    if(row < rows)
+      x[row] = lmem[rows + row];
 }
 
 kernel void gaussian_elimination_no_pivot_buffer(int rows, int cols, int pivot, global double *restrict in_U,
@@ -392,6 +394,7 @@ kernel void gaussian_elimination_solve_buffer(int rows, int cols, global double 
     }
     barrier(CLK_LOCAL_MEM_FENCE);
   }
-  if (get_global_id(0) < rows)
-    x[get_global_id(0)] = lmem[rows + get_global_id(0)];
+  for (int row = li; row < rows_li; row += n_li)
+    if(row < rows)
+      x[row] = lmem[rows + row];
 }

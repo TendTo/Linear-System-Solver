@@ -222,7 +222,7 @@ float *Gaussian_elimination_no_pivot_gpu_texture(float *A, float *b, size_t n, c
         gaussian_evt_rn += runtime_ns(gaussian_evt);
     }
     lws[0] = rows < 64 ? rows : rows / 4;
-    gws[0] = round_mul_up(rows, lws[0]);
+    gws[0] = lws[0];
 
     err = clSetKernelArg(solve_k, 0, sizeof(d_even_U), &d_even_U);
     ocl_check(err, "set arg 0 for solve_k");
@@ -379,7 +379,7 @@ float *Gaussian_elimination_no_pivot_gpu_texture_vec(float *A, float *b, size_t 
         gaussian_evt_rn += runtime_ns(gaussian_evt);
     }
     lws[0] = rows < 64 ? rows : rows / 4;
-    gws[0] = round_mul_up(rows, lws[0]);
+     gws[0] = lws[0];
 
     err = clSetKernelArg(solve_k, 0, sizeof(d_even_U), &d_even_U);
     ocl_check(err, "set arg 0 for solve_k");
@@ -516,7 +516,7 @@ double *Gaussian_elimination_no_pivot_gpu_buffer(double *A, double *b, size_t n,
         gaussian_evt_rn += runtime_ns(gaussian_evt);
     }
     lws[0] = rows < 64 ? rows : rows / 4;
-    gws[0] = round_mul_up(rows, lws[0]);
+    gws[0] = lws[0];
 
     err = clSetKernelArg(solve_k, 0, sizeof(cl_int), &rows);
     ocl_check(err, "set arg 0 for solve_k");
@@ -664,7 +664,7 @@ double *Gaussian_elimination_no_pivot_gpu_buffer_vec(double *A, double *b, size_
     }
     cols *= 4;
     lws[0] = rows < 64 ? rows : rows / 4;
-    gws[0] = round_mul_up(rows, lws[0]);
+    gws[0] = lws[0];
 
     err = clSetKernelArg(solve_k, 0, sizeof(cl_int), &rows);
     ocl_check(err, "set arg 0 for solve_k");
