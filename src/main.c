@@ -162,7 +162,7 @@ void show_help_tooltip(const char *name)
     printf(USAGE, name);
     printf("impcode      -  implementation you want to use.\n\
              1: no pivot cpu\n\
-             2: no pivot lmem\n\
+             2: no pivot lmem [deprecated]\n\
              3: no pivot texture\n\
              4: no pivot buffer\n\
              5: partial pivot cpu\n\

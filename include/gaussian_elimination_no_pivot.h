@@ -30,6 +30,7 @@
 double *Gaussian_elimination_no_pivot(double *A, double *b, size_t n);
 
 /**
+ * @deprecated
  * Applies the Gaussian elimination with no pivoting using only one work-group so that all the matrix can be stored in local memory.
  * This translates in a faster implementation, but there is the risk of being unable to solve otherwise solvable systems
  * 
