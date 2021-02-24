@@ -41,7 +41,7 @@ START_TEST(test_Gaussian_elimination_no_pivot_1000)
     free(x);
 }
 END_TEST
-
+#ifdef LMEM 
 START_TEST(test_Gaussian_elimination_no_pivot_gpu_lmem_3)
 {
     const int n = 3;
@@ -67,7 +67,7 @@ START_TEST(test_Gaussian_elimination_no_pivot_gpu_lmem_10)
     free(x);
 }
 END_TEST
-
+#endif
 START_TEST(test_Gaussian_elimination_no_pivot_gpu_texture_3)
 {
     const int n = 3;
@@ -221,8 +221,10 @@ Suite *gaussian_elimination_no_pivot_suite(void)
     tcase_add_test(tc_core, test_Gaussian_elimination_no_pivot_3_comma);
     tcase_add_test(tc_core, test_Gaussian_elimination_no_pivot_10);
     tcase_add_test(tc_core, test_Gaussian_elimination_no_pivot_1000);
+    #ifdef LMEM
     tcase_add_test(tc_core, test_Gaussian_elimination_no_pivot_gpu_lmem_3);
     tcase_add_test(tc_core, test_Gaussian_elimination_no_pivot_gpu_lmem_10);
+    #endif
     tcase_add_test(tc_core, test_Gaussian_elimination_no_pivot_gpu_texture_3);
     tcase_add_test(tc_core, test_Gaussian_elimination_no_pivot_gpu_texture_10);
     tcase_add_test(tc_core, test_Gaussian_elimination_no_pivot_gpu_texture_1000);
