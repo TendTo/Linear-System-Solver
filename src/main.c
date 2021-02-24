@@ -37,7 +37,7 @@ int main(int argc, char *const *argv)
             }
             break;
         case 'h':
-            show_help_tooltip(argv[0]);
+            printf(HELP_TOOLTIP, argv[0]);
             exit(EXIT_SUCCESS);
             break;
         case 'v':
@@ -152,29 +152,4 @@ int main(int argc, char *const *argv)
         free(x_f);
 
     return 0;
-}
-
-void show_help_tooltip(const char *name)
-{
-    printf("---------------------------------------------------------------------\n");
-    printf("%s - v0.0.1  \n", name);
-    printf("---------------------------------------------------------------------\n");
-    printf(USAGE, name);
-    printf("impcode      -  implementation you want to use.\n\
-             1: no pivot cpu\n\
-             2: no pivot lmem [deprecated]\n\
-             3: no pivot texture\n\
-             4: no pivot buffer\n\
-             5: partial pivot cpu\n\
-             6: partial pivot texture\n\
-             7: partial pivot buffer\n");
-    printf("ocldname     -  path to the directory that contains the oclfiles\n");
-    printf("-i infname   -  use the specified file to fetch the matrix.\n\
-             It must state all the elements of the complete matrix, separated by spaces\n");
-    printf("-o outfname  -  use the specified file to print the result vector. Defauts to use standard output\n");
-    printf("-s seed      -  seed used to generate the matrix if -f is not specified. Defaults to 123\n");
-    printf("-d dim       -  number of unknowns of the generated the matrix if -f is not specified. Defaults to 1000\n");
-    printf("-v           -  enables vectorization, if the chosen implementation supports it.\n\
-             The number of unknowns must be 1 less than a multiple of 4\n");
-
 }
