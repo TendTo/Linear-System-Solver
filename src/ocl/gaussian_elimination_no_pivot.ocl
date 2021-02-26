@@ -111,13 +111,13 @@ kernel void gaussian_elimination_no_pivot_texture(int pivot, image2d_t read_only
     float old_val = read_imagef(in_U, s, (int2)(col, row)).s0;
     float new_val = old_val + pivot_row_val * mult;
     write_imagef(out_U, (int2)(col, row), (float4)(new_val, 0.0f, 0.0f, 1.0f));
-  }
 
-  // Copy the pivot row on the output
-  if (row == pivot + 1) {
-    write_imagef(out_U, (int2)(col, pivot), (float4)(pivot_row_val, 0.0f, 0.0f, 1.0f));
-    if (col == pivot + 1)
-      write_imagef(out_U, (int2)(pivot, pivot), (float4)(pivot_val, 0.0f, 0.0f, 1.0f));
+    // Copy the pivot row on the output
+    if (row == pivot + 1) {
+      write_imagef(out_U, (int2)(col, pivot), (float4)(pivot_row_val, 0.0f, 0.0f, 1.0f));
+      if (col == pivot + 1)
+        write_imagef(out_U, (int2)(pivot, pivot), (float4)(pivot_val, 0.0f, 0.0f, 1.0f));
+    }
   }
 }
 
@@ -210,13 +210,13 @@ kernel void gaussian_elimination_no_pivot_texture_vec(int pivot, image2d_t read_
     float4 old_val = read_imagef(in_U, s, (int2)(col, row));
     float4 new_val = old_val + pivot_row_val * (float4)(mult);
     write_imagef(out_U, (int2)(col, row), new_val);
-  }
 
-  // Copy the pivot row on the output
-  if (row == pivot + 1) {
-    write_imagef(out_U, (int2)(col, pivot), pivot_row_val);
-    if (col == pivot + 1)
-      write_imagef(out_U, (int2)(pivot_quarts, pivot), pivot_val4);
+    // Copy the pivot row on the output
+    if (row == pivot + 1) {
+      write_imagef(out_U, (int2)(col, pivot), pivot_row_val);
+      if (col == pivot + 1)
+        write_imagef(out_U, (int2)(pivot_quarts, pivot), pivot_val4);
+    }
   }
 }
 
