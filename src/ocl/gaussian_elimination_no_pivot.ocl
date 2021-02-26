@@ -27,7 +27,7 @@ Bruteforce print_mat_lin
   }
 */
 
-constant sampler_t s = CLK_NORMALIZED_COORDS_FALSE;
+constant sampler_t s = CLK_NORMALIZED_COORDS_FALSE | CLK_FILTER_NEAREST;
 
 kernel void gaussian_elimination_no_pivot_lmem(int cols, global double *restrict U, global double *restrict x,
                                                local double *restrict lmem) {
@@ -102,17 +102,16 @@ kernel void gaussian_elimination_no_pivot_texture(int pivot, image2d_t read_only
   const int cols = get_image_width(in_U);
   const int rows = get_image_height(in_U);
 
-  if (col >= cols || row >= rows)
-    return;
+  if (col < cols && row < rows) {
+    float pivot_val = read_imagef(in_U, s, (int2)(pivot, pivot)).s0;
+    float head_row_val = read_imagef(in_U, s, (int2)(pivot, row)).s0;
+    float mult = -head_row_val / pivot_val;
 
-  float pivot_val = read_imagef(in_U, s, (int2)(pivot, pivot)).s0;
-  float head_row_val = read_imagef(in_U, s, (int2)(pivot, row)).s0;
-  float mult = -head_row_val / pivot_val;
-
-  float pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot)).s0;
-  float old_val = read_imagef(in_U, s, (int2)(col, row)).s0;
-  float new_val = old_val + pivot_row_val * mult;
-  write_imagef(out_U, (int2)(col, row), (float4)(new_val, 0.0f, 0.0f, 1.0f));
+    float pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot)).s0;
+    float old_val = read_imagef(in_U, s, (int2)(col, row)).s0;
+    float new_val = old_val + pivot_row_val * mult;
+    write_imagef(out_U, (int2)(col, row), (float4)(new_val, 0.0f, 0.0f, 1.0f));
+  }
 
   // Copy the pivot row on the output
   if (row == pivot + 1) {
@@ -183,36 +182,35 @@ kernel void gaussian_elimination_no_pivot_texture_vec(int pivot, image2d_t read_
   const int cols = get_image_width(in_U);
   const int rows = get_image_height(in_U);
 
-  if (col >= cols || row >= rows)
-    return;
+  if (col < cols && row < rows) {
+    float4 pivot_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, pivot));
+    float4 head_row_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, row));
+    float pivot_val, head_row_val;
+    switch (pivot & 3) {
+    case 0:
+      pivot_val = pivot_val4.s0;
+      head_row_val = head_row_val4.s0;
+      break;
+    case 1:
+      pivot_val = pivot_val4.s1;
+      head_row_val = head_row_val4.s1;
+      break;
+    case 2:
+      pivot_val = pivot_val4.s2;
+      head_row_val = head_row_val4.s2;
+      break;
+    case 3:
+      pivot_val = pivot_val4.s3;
+      head_row_val = head_row_val4.s3;
+      break;
+    }
+    float mult = -head_row_val / pivot_val;
 
-  float4 pivot_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, pivot));
-  float4 head_row_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, row));
-  float pivot_val, head_row_val;
-  switch (pivot & 3) {
-  case 0:
-    pivot_val = pivot_val4.s0;
-    head_row_val = head_row_val4.s0;
-    break;
-  case 1:
-    pivot_val = pivot_val4.s1;
-    head_row_val = head_row_val4.s1;
-    break;
-  case 2:
-    pivot_val = pivot_val4.s2;
-    head_row_val = head_row_val4.s2;
-    break;
-  case 3:
-    pivot_val = pivot_val4.s3;
-    head_row_val = head_row_val4.s3;
-    break;
+    float4 pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot));
+    float4 old_val = read_imagef(in_U, s, (int2)(col, row));
+    float4 new_val = old_val + pivot_row_val * (float4)(mult);
+    write_imagef(out_U, (int2)(col, row), new_val);
   }
-  float mult = -head_row_val / pivot_val;
-
-  float4 pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot));
-  float4 old_val = read_imagef(in_U, s, (int2)(col, row));
-  float4 new_val = old_val + pivot_row_val * (float4)(mult);
-  write_imagef(out_U, (int2)(col, row), new_val);
 
   // Copy the pivot row on the output
   if (row == pivot + 1) {
