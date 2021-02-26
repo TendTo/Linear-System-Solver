@@ -302,7 +302,7 @@ kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, i
       x[row] = lmem[rows + row];
 }
 
-kernel void gaussian_elimination_no_pivot_buffer(int rows, int cols, int pivot, global double *restrict in_U,
+kernel void gaussian_elimination_no_pivot_buffer(int rows, int cols, int pivot, global const double *restrict in_U,
                                                  global double *restrict out_U) {
   const int col = get_global_id(0) + pivot + 1;
   const int row = get_global_id(1) + pivot + 1;
@@ -321,7 +321,8 @@ kernel void gaussian_elimination_no_pivot_buffer(int rows, int cols, int pivot, 
 }
 
 kernel void gaussian_elimination_no_pivot_buffer_vec(int rows, int cols_quarts, int pivot,
-                                                     global double4 *restrict in_U, global double4 *restrict out_U) {
+                                                     global const double4 *restrict in_U,
+                                                     global double4 *restrict out_U) {
   global const double *s_in_U = in_U;
 
   const int pivot_quarts = pivot / 4;
@@ -342,8 +343,8 @@ kernel void gaussian_elimination_no_pivot_buffer_vec(int rows, int cols_quarts, 
   out_U[row * cols_quarts + col] = new_val;
 }
 
-kernel void gaussian_elimination_solve_buffer(int rows, int cols, global double *restrict even_U,
-                                              global double *restrict odd_U, global double *restrict x,
+kernel void gaussian_elimination_solve_buffer(int rows, int cols, global const double *restrict even_U,
+                                              global const double *restrict odd_U, global double *restrict x,
                                               local double *restrict lmem) {
   global double *in_U;
 
