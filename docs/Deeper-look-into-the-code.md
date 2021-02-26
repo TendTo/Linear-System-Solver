@@ -60,6 +60,13 @@ float pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot)).s0;
 float old_val = read_imagef(in_U, s, (int2)(col, row)).s0;
 float new_val = old_val + pivot_row_val * mult;
 write_imagef(out_U, (int2)(col, row), (float4)(new_val, 0.0f, 0.0f, 1.0f));
+
+// Copy the pivot row on the output
+if (row == pivot + 1) {
+  write_imagef(out_U, (int2)(col, pivot), (float4)(pivot_row_val, 0.0f, 0.0f, 1.0f));
+  if (col == pivot + 1)
+     write_imagef(out_U, (int2)(pivot, pivot), (float4)(pivot_val, 0.0f, 0.0f, 1.0f);
+}
 ```
 
 </td>
@@ -71,8 +78,10 @@ in this version, each pixel of the texture contains exactly one value of the mat
 Each work-item reads the value at the pivot position, *pivot_val* and the value on the position that will be set to 0, *head_ro_val*.  
 With those two, *mult* can be calculated (mind the minus sign).  
 
-Finally, *pivot_row_val*, which is on the *pivot_row* but in the same column as the work-item is multiplied with by the *mult* and the result is added to the current *old_val*.  
-The *new_value* found will replace the old one and will be written in the output texture.
+Then, *pivot_row_val*, which is on the *pivot_row* but in the same column as the work-item is multiplied with by the *mult* and the result is added to the current *old_val*.  
+The *new_value* found will replace the old one and will be written on the output texture.
+
+Finally, the pivot row is also written on the output texture.
 
 </td>
 </tr>
@@ -119,12 +128,8 @@ The following code is executed **n** times to calculate all **n** solutions.
 ```c
 //Sliding window
 for (int col = li; col < rows_li; col += n_li) {
-  //If the col index is in the range of interest
   if (col > row && col < rows) {
-    //The texture from which to get the coefficient depends on whether
-    //the row index is even or odd
-    float coefficient = (row & 1) ? read_imagef(odd_U, s, (int2)(col, row)).s0 
-                                  : read_imagef(even_U, s, (int2)(col, row)).s0;
+    float coefficient = read_imagef(in_U, s, (int2)(col, row)).s0;
     lmem[col] = lmem[rows + col] * coefficient;
   }
 }
@@ -187,16 +192,10 @@ In the case that the number of elements to sum was not even, the last element wi
 for (int col = li; col < rows_li; col += n_li) {
   //Only the diagonal col 
   if (col == row) {
-    float coefficient;
-    float sum;
-    if (row & 1) {
-      coefficient = read_imagef(odd_U, s, (int2)(col, row)).s0;
-      sum = read_imagef(odd_U, s, (int2)(cols - 1, row)).s0;
-    } else {
-      coefficient = read_imagef(even_U, s, (int2)(col, row)).s0;
-      sum = read_imagef(even_U, s, (int2)(cols - 1, row)).s0;
-    }
-    sum -= lmem[row + 1];
+    float coefficient = read_imagef(in_U, s, (int2)(col, row)).s0;
+    float sum = read_imagef(in_U, s, (int2)(cols - 1, row)).s0;
+    if (row != rows - 1)
+      sum -= lmem[row + 1];
     //Storing the result value
     lmem[rows + col] = sum / coefficient;
   }
@@ -227,8 +226,8 @@ finally, the row-th unknown is calculated, retrieving the needed values from the
 
 ```c
 //Used to access single values in the buffers
-global read_only const double *s_in_U = in_U;
-global write_only double *s_out_U = out_U;
+global const double *s_in_U = in_U;
+global double *s_out_U = out_U;
 
 const int pivot_quarts = pivot / 4;
 const int col = get_global_id(0) + pivot / 4;
@@ -351,6 +350,18 @@ if (row == pivot + 1) {
   out_U[pivot * cols_quarts + col] = pivot_row_val;
   if (col == pivot + 1)
     s_out_U[pivot * cols + pivot] = pivot_val;
+
+  // Copy the row above the pivot row on the output, if present
+  if (pivot > 0) {
+    double4 upper_val = in_U[(pivot - 1) * cols_quarts + col];
+    out_U[(pivot - 1) * cols_quarts + col] = upper_val;
+    if (col == pivot + 1) {
+      double upper_left_val = s_in_U[(pivot - 1) * cols + pivot - 1];
+      double upper_pivot_val = s_in_U[(pivot - 1) * cols + pivot];
+      s_out_U[(pivot - 1) * cols + pivot - 1] = upper_left_val;
+      s_out_U[(pivot - 1) * cols + pivot] = upper_pivot_val;
+    }
+  }
 }
 ```
 
@@ -365,7 +376,7 @@ With those two, *mult* can be calculated (mind the minus sign).
 
 Then, *pivot_row_val*, which is on the *pivot_row* but in the same column as the work-item is multiplied with by the *mult* and the result is added to the current *old_val*, in a vectorized operation.  
 The *new_value* found will replace the old one and will be written in the output texture.  
-In addition, the pivot row is also written in the output buffer, to simulate the possible swap that may have occurred.
+In addition, the pivot row and the row above it, if present, is also written in the output buffer, to simulate the possible swap that may have occurred. 
 
 </td>
 </tr>
