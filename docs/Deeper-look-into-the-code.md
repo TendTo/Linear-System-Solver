@@ -16,6 +16,8 @@ At the end of the second iteration, a sub-matrix with two fewer rows and columns
 Since the rows that make up the matrix in echelon form are precisely the various pivot rows found in the previous steps, it follows that the "final" rows will be found only on j1 ​​or j2, depending on whether they were even or odd.  
 An exception to this rules occurs in the **partial pivot** versions, since there two rows are carried over to the output memory object, meaning that the final row will be on the same location as the previous row.
 
+- **Texture sampler:** the texture sampler used to read the 2D texture uses normalized coords and filter mode nearest. This means that an int2 is used to access the memory location, specifing the index of the column and of the row, exactly as one would do for a matrix, but in this order.
+
 - **Local memory size in solve kernels:** in the solve kernels, the local memory is actually divided into two "logical" sections, and the offset between one and the other is exactly _rows_, that is the number of rows (and therefore of solutions) of the system. The first _rows_ positions are used for the reduction, the last _rows_ contain the results, as they are calculated.  
 The local memory, in total, contains _2rows_ elements.
 
@@ -56,14 +58,16 @@ The pivot's value, on the other hand, starts at 0 and increases by one each time
 <td>
 
 ```c
-float pivot_val = read_imagef(in_U, s, (int2)(pivot, pivot)).s0;
-float head_row_val = read_imagef(in_U, s, (int2)(pivot, row)).s0;
-float mult = -head_row_val / pivot_val;
+if (col < cols && row < rows) {
+  float pivot_val = read_imagef(in_U, s, (int2)(pivot, pivot)).s0;
+  float head_row_val = read_imagef(in_U, s, (int2)(pivot, row)).s0;
+  float mult = -head_row_val / pivot_val;
 
-float pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot)).s0;
-float old_val = read_imagef(in_U, s, (int2)(col, row)).s0;
-float new_val = old_val + pivot_row_val * mult;
-write_imagef(out_U, (int2)(col, row), (float4)(new_val, 0.0f, 0.0f, 1.0f));
+  float pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot)).s0;
+  float old_val = read_imagef(in_U, s, (int2)(col, row)).s0;
+  float new_val = old_val + pivot_row_val * mult;
+  write_imagef(out_U, (int2)(col, row), (float4)(new_val, 0.0f, 0.0f, 1.0f));
+}
 ```
 
 </td>
