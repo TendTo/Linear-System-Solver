@@ -1,30 +1,30 @@
 # Deeper look into the code
 
 ### **Introduction**
-This section is meant to give an overview on the code used in the various implementations of the Gaussian elimination, tring to exapain more cleary what each piece of code is supposed to do.  
+This section is meant to give an overview on the code used in the various implementations of the Gaussian elimination, trying to explain more clearly what each piece of code is supposed to do.  
 
 The **lmem** implementation will not be shown since it is the simplest one. It was used to get some ideas on how to approach the problem, but it is since been deprecated.
 
 ### **General principles**
-- **Memory object ping-pong:** since each iteration of the Gaussian elimination algorithm depens on the iteration before, data needs to be shynchronized.   
+- **Memory object ping-pong:** since each iteration of the Gaussian elimination algorithm depends on the iteration before, data needs to be synchronized.   
 To achieve this even for very large matrices, the solution is to use two memory objects that will be swapped at each iteration. One will provide the input, the other will store the output.  
 This also means that all the fully reduced even rows will be on one memory objects, while the odd ones will be on the other.  
 The reason is that in the elimination phase only one of the two mem-obj is used to write only the lines that have been modified, and then the two are inverted in the next.  
 Let's put ourselves in the case with no pivot for simplicity, and call j1 the first mem-obj, which currently contains the entire matrix, and j2 the second, which contains nothing.  
-At the end of the first iteration, only a submatrix is ​​written to j2, which contains one row and one column less than the original matrix and which starts from index (1,1). The pivot row is excluded.  
-At the end of the second iteration, a submatrix with two fewer rows and columns than the original one will be overwritten on j1, starting from index (2,2), leaving out the new pivot row, index 1. And so on.  
+At the end of the first iteration, only a sub-matrix is ​​written to j2, which contains one row and one column less than the original matrix and which starts from index (1,1). The pivot row is excluded.  
+At the end of the second iteration, a sub-matrix with two fewer rows and columns than the original one will be overwritten on j1, starting from index (2,2), leaving out the new pivot row, index 1. And so on.  
 Since the rows that make up the matrix in echelon form are precisely the various pivot rows found in the previous steps, it follows that the "final" rows will be found only on j1 ​​or j2, depending on whether they were even or odd.  
-An exeption to this rules occurs in the **partial pivot** versions, since there two rows are carried over to the output memory object, meaning that the final row will be on the same location as the previous row.
+An exception to this rules occurs in the **partial pivot** versions, since there two rows are carried over to the output memory object, meaning that the final row will be on the same location as the previous row.
 
 - **Local memory size in solve kernels:** in the solve kernels, the local memory is actually divided into two "logical" sections, and the offset between one and the other is exactly _rows_, that is the number of rows (and therefore of solutions) of the system. The first _rows_ positions are used for the reduction, the last _rows_ contain the results, as they are calculated.  
 The local memory, in total, contains _2rows_ elements.
 
-- **Sliding window:** this means that all the work-items in a work-group are able to work on a vector that has more elements than the numer of work-items in the work-group.  
+- **Sliding window:** this means that all the work-items in a work-group are able to work on a vector that has more elements than the number of work-items in the work-group.  
 The method to achieve this is simple: let us assume say the local work size is **n** and the number of elements to elaborate is **l * n**.  
 With the sliding window, the first **n** elements are evaluated, and then the next **n** and so on, **l** times.  
 If **l** is not an integer, it is better to round the number of elements to the next multiple of **n** bigger than **l * n**, to make sure all work-items meets all the local memory fences.
 
-Only two exaples will be shown, since most of the code is very similar in all the implementations and those two are the most significative.
+Only two examples will be shown, since most of the code is very similar in all the implementations and those two are the most significative.
 
 ### **No pivot Gaussian elimination texture**
 <table>
@@ -46,9 +46,9 @@ const int rows = get_image_height(in_U);
 <td>
 
 **Initial constants:**  
-on its first lauch, the kernel has (**cols - 1** X **rows - 1**) work-items.  
-This kernel is launched **n - 1** times and with each iteration the number of work-item in each dimention decreases br y one.  
-The pivot's value, on the other hand, starst at 0 and increases by one each time.
+on its first launch, the kernel has (**cols - 1** X **rows - 1**) work-items.  
+This kernel is launched **n - 1** times and with each iteration the number of work-item in each dimension decreases br y one.  
+The pivot's value, on the other hand, starts at 0 and increases by one each time.
 
 </td>
 </tr>
@@ -75,7 +75,7 @@ in this version, each pixel of the texture contains exactly one value of the mat
 Each work-item reads the value at the pivot position, *pivot_val* and the value on the position that will be set to 0, *head_ro_val*.  
 With those two, *mult* can be calculated (mind the minus sign).  
 
-Finally, *pivot_row_val*, which is on the *pivot_row* but in the same column as the work-item is multipied with by the *mult* and the result is added to the current *old_val*.  
+Finally, *pivot_row_val*, which is on the *pivot_row* but in the same column as the work-item is multiplied with by the *mult* and the result is added to the current *old_val*.  
 The *new_value* found will replace the old one and will be written in the output texture.
 
 </td>
@@ -113,7 +113,7 @@ The local work size can be altered at will, but bigger size should lead to a fas
 
 *rows_li* is used to ensure that all work-items reach the various barriers inside the for loop.
 
-The following code is execuded **n** times to calculate all **n** solutions.
+The following code is executed **n** times to calculate all **n** solutions.
 
 </td>
 </tr>
@@ -141,8 +141,8 @@ barrier(CLK_LOCAL_MEM_FENCE);
 **Filling the local memory:**  
 the for loop implements a sliding window, so that to the work-items in the work-group will be assigned each possible column value.  
 
-Then, only if the column is in the correct range, the corrisponding spot in the local memory is filled.  
-The input texture from which the value will be taken depends on whethre or not the row is odd.
+Then, only if the column is in the correct range, the corresponding spot in the local memory is filled.  
+The input texture from which the value will be taken depends on whether or not the row is odd.
 
 </td>
 </tr>
@@ -180,7 +180,7 @@ The result is to be stored in local memory, at the position *row* + 1.
 
 To achieve this in a O(log(n)) time complexity, in each iteration *i* work-items with an assigned index *col* < *i* calculates the sum between the element *col* element and the *i + col* element.  
 The value of *i* is then halved.
-In the case that the number of elements to sum was not even, the last element wil be added by the last work-item.
+In the case that the number of elements to sum was not even, the last element will be added by the last work-item.
 </td>
 </tr>
 <tr>
@@ -224,7 +224,7 @@ finally, the row-th unknown is calculated, retrieving the needed values from the
 <table>
 <tr>
 <th>Code</th>
-<th>Explaination</th>
+<th>Explanation</th>
 </tr>
 <tr>
 <td>
@@ -247,9 +247,9 @@ const int n_li = get_local_size(0) * get_local_size(1);
 <td>
 
 **Initial constants:**  
-on its first lauch, and since wher are using the vectorized version, the kernel has (**(cols - 1) / 4** X **rows - 1**) work-items.  
+on its first launch, and since we are are using the vectorized version, the kernel has (**(cols - 1) / 4** X **rows - 1**) work-items.  
 This kernel is launched **n - 1** times and with each iteration the number of work-item in the second dimension decreases by one, while in the other dimensions does so only every four iterations.  
-The pivot's value, on the other hand, starst at 0 and increases by one each time.
+The pivot's value, on the other hand, starts at 0 and increases by one each time.
 
 </td>
 </tr>
@@ -323,7 +323,7 @@ The index of this *row* is to be stored in local memory, at the position *row* +
 
 To achieve this in a O(log(n)) time complexity, in each iteration *i* work-items with an assigned index *col* < *i* stores the greater element between the one with index *col* and the one of index *i + col*.  
 The value of *i* is then halved.
-In the case that the number of elements to check was not even, the last element wil be considered by the last work-item.
+In the case that the number of elements to check was not even, the last element will be considered by the last work-item.
 
 </td>
 </tr>
@@ -367,9 +367,9 @@ in this version, each element of the input buffer contains 4 double.
 Each work-item reads the value at the pivot position, *pivot_val* and the value on the position that will be set to 0, *head_ro_val*  
 With those two, *mult* can be calculated (mind the minus sign).  
 
-Then, *pivot_row_val*, which is on the *pivot_row* but in the same column as the work-item is multipied with by the *mult* and the result is added to the current *old_val*, in a vectorized operation.  
+Then, *pivot_row_val*, which is on the *pivot_row* but in the same column as the work-item is multiplied with by the *mult* and the result is added to the current *old_val*, in a vectorized operation.  
 The *new_value* found will replace the old one and will be written in the output texture.  
-In addition, the pivot row is also written in the ouput buffer, to simulate the possible swap that may have occurred.
+In addition, the pivot row is also written in the output buffer, to simulate the possible swap that may have occurred.
 
 </td>
 </tr>

@@ -9,11 +9,25 @@
 
 void initialize_consts()
 {
-    srand(123);
+    putenv("CK_DEFAULT_TIMEOUT=10");
     for (int i = 109; i >= 0; --i)
-        U_10[i] = i * i - 2 * i - 1000 + i % 4 * 5 - i % 5 * i;
+    {
+        double val = i * i - 2 * i - 1000 + i % 4 * 5 - i % 5 * i;
+        U_10[i] = val;
+        U_10_f[i] = (float)val;
+    }
+    srand(123);
+    for (size_t i = 0; i < 4032; ++i)
+        U_63[i] = (rand() / (double)RAND_MAX - 0.5) * 1000;
+    srand(123);
+    for (size_t i = 0; i < 4032; ++i)
+        U_63_f[i] = (rand() / (float)RAND_MAX - 0.5) * 1000;
+    srand(123);
     for (size_t i = 0; i < 1001000; ++i)
         U_1000[i] = (rand() / (double)RAND_MAX - 0.5) * 1000;
+    srand(123);
+    for (size_t i = 0; i < 1001000; ++i)
+        U_1000_f[i] = (rand() / (float)RAND_MAX - 0.5) * 1000;
 }
 
 int main(void)

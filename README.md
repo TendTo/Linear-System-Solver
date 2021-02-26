@@ -26,6 +26,33 @@ Small application that aims to solve systems of linear equations using the gener
 - The executable will be found in the bin folder, while all the object files will be in the build folder
 - You can also run the compiler manually. All the c files are in the _src_ folder, while the headers are in the _include_ folder.
 
+**Use:**
+```bash
+---------------------------------------------------------------------
+Usage: ./bin/LinearSystemSolver [-i infname] [-o outfname] [-s seed] [-d dim] [-v] ocldname impcode
+---------------------------------------------------------------------
+impcode      -  implementation you want to use.
+                1: no pivot cpu
+                2: no pivot lmem [deprecated]
+                3: no pivot texture
+                4: no pivot buffer
+                5: partial pivot cpu
+                6: partial pivot texture
+                7: partial pivot buffer
+ocldname     -  path to the directory that contains the oclfiles
+
+-i infname   -  path of the file from which to fetch the matrix.
+                It must state all the elements of the complete matrix, separated by spaces, row by row
+-o outfname  -  path of the file where to print the result vector.
+                Defaults to use the standard output. If it is not specified, a dummy matrix will be generated
+-s seed      -  seed used to generate the matrix if -f is not specified.
+                Defaults to 123
+-d dim       -  number of unknowns of the matrix.
+                Defaults to 1000
+-v           -  enables vectorization, if the chosen implementation supports it.
+                The number of unknowns must be 1 less than a multiple of 4
+```
+
 ## :bar_chart: _[Optional]_ Testing
 
 #### Requirements

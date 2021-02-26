@@ -27,7 +27,7 @@ Bruteforce print_mat_lin
   }
 */
 
-constant sampler_t s = CLK_NORMALIZED_COORDS_FALSE;
+constant sampler_t s = CLK_NORMALIZED_COORDS_FALSE | CLK_FILTER_NEAREST;
 
 kernel void gaussian_elimination_pivot_texture(int pivot, image2d_t read_only in_U, image2d_t write_only out_U,
                                                local float *restrict lmem, local uint *restrict i_lmem) {
@@ -76,28 +76,27 @@ kernel void gaussian_elimination_pivot_texture(int pivot, image2d_t read_only in
   }
   int pivot_row = i_lmem[0];
 
-  if (col >= cols || row >= rows)
-    return;
+  if (col < cols && row < rows) {
+    float head_row_val, old_val;
+    if (row != pivot_row) {
+      head_row_val = read_imagef(in_U, s, (int2)(pivot, row)).s0;
+      old_val = read_imagef(in_U, s, (int2)(col, row)).s0;
+    } else {
+      head_row_val = read_imagef(in_U, s, (int2)(pivot, pivot)).s0;
+      old_val = read_imagef(in_U, s, (int2)(col, pivot)).s0;
+    }
+    float pivot_val = read_imagef(in_U, s, (int2)(pivot, pivot_row)).s0;
+    float pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot_row)).s0;
+    float mult = -head_row_val / pivot_val;
+    float new_val = old_val + pivot_row_val * mult;
+    write_imagef(out_U, (int2)(col, row), (float4)(new_val, 0.0f, 0.0f, 1.0f));
 
-  float head_row_val, old_val;
-  if (row != pivot_row) {
-    head_row_val = read_imagef(in_U, s, (int2)(pivot, row)).s0;
-    old_val = read_imagef(in_U, s, (int2)(col, row)).s0;
-  } else {
-    head_row_val = read_imagef(in_U, s, (int2)(pivot, pivot)).s0;
-    old_val = read_imagef(in_U, s, (int2)(col, pivot)).s0;
-  }
-  float pivot_val = read_imagef(in_U, s, (int2)(pivot, pivot_row)).s0;
-  float pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot_row)).s0;
-  float mult = -head_row_val / pivot_val;
-  float new_val = old_val + pivot_row_val * mult;
-  write_imagef(out_U, (int2)(col, row), (float4)(new_val, 0.0f, 0.0f, 1.0f));
-
-  // Copy the pivot row on the output
-  if (row == pivot + 1) {
-    write_imagef(out_U, (int2)(col, pivot), (float4)(pivot_row_val, 0.0f, 0.0f, 1.0f));
-    if (col == pivot + 1)
-      write_imagef(out_U, (int2)(pivot, pivot), (float4)(pivot_val, 0.0f, 0.0f, 1.0f));
+    // Copy the pivot row on the output
+    if (row == pivot + 1) {
+      write_imagef(out_U, (int2)(col, pivot), (float4)(pivot_row_val, 0.0f, 0.0f, 1.0f));
+      if (col == pivot + 1)
+        write_imagef(out_U, (int2)(pivot, pivot), (float4)(pivot_val, 0.0f, 0.0f, 1.0f));
+    }
   }
 }
 
@@ -120,8 +119,8 @@ kernel void gaussian_elimination_solve_texture(image2d_t read_only even_U, image
           coefficient = (row & 1) ? read_imagef(odd_U, s, (int2)(col, row)).s0 
                                   : read_imagef(even_U, s, (int2)(col, row)).s0;
         else
-          coefficient = (row & 1) ? read_imagef(even_U, s, (int2)(col, row)).s0 
-                                  : read_imagef(odd_U, s, (int2)(col, row)).s0;
+          coefficient =
+              (row & 1) ? read_imagef(even_U, s, (int2)(col, row)).s0 : read_imagef(odd_U, s, (int2)(col, row)).s0;
         lmem[col] = lmem[rows + col] * coefficient;
       }
     }
@@ -167,7 +166,7 @@ kernel void gaussian_elimination_solve_texture(image2d_t read_only even_U, image
     barrier(CLK_LOCAL_MEM_FENCE);
   }
   for (int row = li; row < rows_li; row += n_li)
-    if(row < rows)
+    if (row < rows)
       x[row] = lmem[rows + row];
 }
 
@@ -232,48 +231,47 @@ kernel void gaussian_elimination_pivot_texture_vec(int pivot, image2d_t read_onl
   }
   int pivot_row = i_lmem[0];
 
-  if (col >= cols || row >= rows)
-    return;
+  if (col < cols && row < rows) {
+    float4 old_val, head_row_val4;
+    float4 pivot_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, pivot_row));
+    if (row != pivot_row) {
+      head_row_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, row));
+      old_val = read_imagef(in_U, s, (int2)(col, row));
+    } else {
+      head_row_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, pivot));
+      old_val = read_imagef(in_U, s, (int2)(col, pivot));
+    }
+    float pivot_val, head_row_val;
+    switch (pivot & 3) {
+    case 0:
+      pivot_val = pivot_val4.s0;
+      head_row_val = head_row_val4.s0;
+      break;
+    case 1:
+      pivot_val = pivot_val4.s1;
+      head_row_val = head_row_val4.s1;
+      break;
+    case 2:
+      pivot_val = pivot_val4.s2;
+      head_row_val = head_row_val4.s2;
+      break;
+    case 3:
+      pivot_val = pivot_val4.s3;
+      head_row_val = head_row_val4.s3;
+      break;
+    }
+    float mult = -head_row_val / pivot_val;
 
-  float4 old_val, head_row_val4;
-  float4 pivot_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, pivot_row));
-  if (row != pivot_row) {
-    head_row_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, row));
-    old_val = read_imagef(in_U, s, (int2)(col, row));
-  } else {
-    head_row_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, pivot));
-    old_val = read_imagef(in_U, s, (int2)(col, pivot));
-  }
-  float pivot_val, head_row_val;
-  switch (pivot & 3) {
-  case 0:
-    pivot_val = pivot_val4.s0;
-    head_row_val = head_row_val4.s0;
-    break;
-  case 1:
-    pivot_val = pivot_val4.s1;
-    head_row_val = head_row_val4.s1;
-    break;
-  case 2:
-    pivot_val = pivot_val4.s2;
-    head_row_val = head_row_val4.s2;
-    break;
-  case 3:
-    pivot_val = pivot_val4.s3;
-    head_row_val = head_row_val4.s3;
-    break;
-  }
-  float mult = -head_row_val / pivot_val;
+    float4 pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot_row));
+    float4 new_val = old_val + pivot_row_val * (float4)(mult);
+    write_imagef(out_U, (int2)(col, row), new_val);
 
-  float4 pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot_row));
-  float4 new_val = old_val + pivot_row_val * (float4)(mult);
-  write_imagef(out_U, (int2)(col, row), new_val);
-
-  // Copy the pivot row on the output
-  if (row == pivot + 1) {
-    write_imagef(out_U, (int2)(col, pivot), pivot_row_val);
-    if (col == pivot + 1)
-      write_imagef(out_U, (int2)(pivot_quarts, pivot), pivot_val4);
+    // Copy the pivot row on the output
+    if (row == pivot + 1) {
+      write_imagef(out_U, (int2)(col, pivot), pivot_row_val);
+      if (col == pivot + 1)
+        write_imagef(out_U, (int2)(pivot_quarts, pivot), pivot_val4);
+    }
   }
 }
 
@@ -374,7 +372,7 @@ kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, i
     barrier(CLK_LOCAL_MEM_FENCE);
   }
   for (int row = li; row < rows_li; row += n_li)
-    if(row < rows)
+    if (row < rows)
       x[row] = lmem[rows + row];
 }
 
@@ -449,10 +447,9 @@ kernel void gaussian_elimination_pivot_buffer(int rows, int cols, int pivot, glo
   }
 }
 
-kernel void gaussian_elimination_pivot_buffer_vec(int rows, int cols_quarts, int pivot,
-                                                  global double4 *restrict in_U,
-                                                  global double4 *restrict out_U,
-                                                  local double *restrict lmem, local uint *restrict i_lmem) {
+kernel void gaussian_elimination_pivot_buffer_vec(int rows, int cols_quarts, int pivot, global double4 *restrict in_U,
+                                                  global double4 *restrict out_U, local double *restrict lmem,
+                                                  local uint *restrict i_lmem) {
   global const double *s_in_U = in_U;
   global double *s_out_U = out_U;
 
@@ -529,8 +526,8 @@ kernel void gaussian_elimination_pivot_buffer_vec(int rows, int cols_quarts, int
 }
 
 kernel void gaussian_elimination_solve_buffer(int rows, int cols, global double *restrict even_U,
-                                              global double *restrict odd_U,
-                                              global double *restrict x, local double *restrict lmem) {
+                                              global double *restrict odd_U, global double *restrict x,
+                                              local double *restrict lmem) {
   global double *in_U;
 
   const int li = get_local_id(0);
@@ -582,6 +579,6 @@ kernel void gaussian_elimination_solve_buffer(int rows, int cols, global double 
     barrier(CLK_LOCAL_MEM_FENCE);
   }
   for (int row = li; row < rows_li; row += n_li)
-    if(row < rows)
+    if (row < rows)
       x[row] = lmem[rows + row];
 }
