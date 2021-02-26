@@ -8,13 +8,9 @@ The **lmem** implementation will not be shown since it is the simplest one. It w
 ### **General principles**
 - **Memory object ping-pong:** since each iteration of the Gaussian elimination algorithm depends on the iteration before, data needs to be synchronized.   
 To achieve this even for very large matrices, the solution is to use two memory objects that will be swapped at each iteration. One will provide the input, the other will store the output.  
-This also means that all the fully reduced even rows will be on one memory objects, while the odd ones will be on the other.  
-The reason is that in the elimination phase only one of the two mem-obj is used to write only the lines that have been modified, and then the two are inverted in the next.  
-Let's put ourselves in the case with no pivot for simplicity, and call j1 the first mem-obj, which currently contains the entire matrix, and j2 the second, which contains nothing.  
-At the end of the first iteration, only a sub-matrix is ​​written to j2, which contains one row and one column less than the original matrix and which starts from index (1,1). The pivot row is excluded.  
-At the end of the second iteration, a sub-matrix with two fewer rows and columns than the original one will be overwritten on j1, starting from index (2,2), leaving out the new pivot row, index 1. And so on.  
-Since the rows that make up the matrix in echelon form are precisely the various pivot rows found in the previous steps, it follows that the "final" rows will be found only on j1 ​​or j2, depending on whether they were even or odd.  
-An exception to this rules occurs in the **partial pivot** versions, since there two rows are carried over to the output memory object, meaning that the final row will be on the same location as the previous row.
+The reason is that in the elimination phase one of the two mem-obj is used to write the lines that have been modified, plus the pivot row, and then the two are inverted in the next.  
+In the case of the partial pivot version, the row above the pivot is copied too, if it is present.
+In the end, the matrix in echelon form will be found on the last output mem-object.
 
 - **Local memory size in solve kernels:** in the solve kernels, the local memory is actually divided into two "logical" sections, and the offset between one and the other is exactly _rows_, that is the number of rows (and therefore of solutions) of the system. The first _rows_ positions are used for the reduction, the last _rows_ contain the results, as they are calculated.  
 The local memory, in total, contains _2rows_ elements.

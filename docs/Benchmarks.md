@@ -14,33 +14,33 @@ The speedup refers to the corrisponding serial implementation.
 
 | (intel) Intel i5-7600 CPU @ 3.50GHz | Gaussian elimination kernel | Solution vector kernel | TOT | Speedup |
 | - | - | - | - | :-: |
-| No pivot texture | 1064.75 | 14.23 | 1078.98 | x0.9 |
-| No pivot texture vec 4 | 302.83 | 14.56 | 317.39 | x3 |
-| No pivot buffer | 343.59 | 24.12 | 367.71 | x2.5 |
-| No pivot buffer vec 4 | 277.34 | 24.41 | 301.75 | x3.1 |
-| Partial pivot texture | 6593.59 | 15.37 | 6608.96 | x0.2 |
-| Partial pivot texture vec 4 | 1603.84 | 16.17 | 1620.01 | x0.6 |
-| Partial pivot buffer | 5218.78 | 26.33 | 5245.11 | x0.2 |
-| Partial pivot buffer vec 4 | 1274.35 | 26.36 | 1300.71 | x0.8 |
+| No pivot texture | 1048.22 | 15.15 | 1063.37 | x0.9 |
+| No pivot texture vec 4 | 276.81 | 15.53 | 317.39 | x3.2 |
+| No pivot buffer | 312.46 | 12.80 | 325.25 | x2.9 |
+| No pivot buffer vec 4 | 260.13 | 12.69 | 272.82 | x3.4 |
+| Partial pivot texture | 5332.55 | 13.65 | 5346.2 | x0.2 |
+| Partial pivot texture vec 4 | 1386.78 | 14.49 | 1401.27 | x0.7 |
+| Partial pivot buffer | 4112.99 | 12.26 | 4125.25 | x0.2 |
+| Partial pivot buffer vec 4 | 1115.63 | 12.23 | 1127.87 | x0.8 |
 
 | (pocl) Intel i5-7600 CPU @ 3.50GHz | Gaussian elimination kernel | Solution vector kernel | TOT | Speedup |
 | - | - | - | - | :-: |
-| No pivot texture vec 4 | 1363.69 | 23.95 | 1387.64 | x0.7 |
-| No pivot buffer | 296.43 | 19.55 | 315.98 | x2.9 |
-| No pivot buffer vec 4 | 266.76 | 19.63 | 286.39 | x3.3 |
-| Partial pivot texture vec 4 | 3002.90 | 23.81 | 3026.71 | x0.3 |
-| Partial pivot buffer | 3546.58 | 18.58 | 3565.16 | x0.3 |
-| Partial pivot buffer vec 4 | 1057.72 | 20.67 | 1078.39 | x0.9 |
+| No pivot texture vec 4 | 1324.80 | 16.61 | 1341.41 | x0.7 |
+| No pivot buffer | 377.64 | 11.14 | 388.78 | x2.4 |
+| No pivot buffer vec 4 | 335.87 | 11.09 | 346.96 | x2.7 |
+| Partial pivot texture vec 4 | 2574.98 | 15.84 | 2590.82 | x0.4 |
+| Partial pivot buffer | 3546.58 | 10.58 | 3557.16 | x0.3 |
+| Partial pivot buffer vec 4 | 921.55 | 11.67 | 1069.39 | x0.9 |
 
 | Nvidia GeForce GTX 1060 3GB | Gaussian elimination kernel | Solution vector kernel | TOT | Speedup |
 | - | - | - | - | :-: |
-| No pivot texture | 46.25 | 2.31 | 48.56 | x19.4 |
-| No pivot texture vec 4 | 26.95 | 2.28 | 29.23 | x32.2 |
-| No pivot buffer | 58.13 | 3.65 | 61.78 | x15.2 |
-| No pivot buffer vec 4 | 39.36 | 3.91 | 43.27 | x21.7 |
-| Partial pivot texture | 188.69 | 4.19 | 190.5 | x5.3 |
-| Partial pivot texture vec 4 | 45.86 | 4.77 | 50.63 | x19.9 |
-| Partial pivot buffer | 408.19 | 5.24 | 413.43 | x2.4 |
+| No pivot texture | 47.21 | 4.05 | 51.25 | x18.3 |
+| No pivot texture vec 4 | 26.95 | 4.55 | 31.50 | x29.9 |
+| No pivot buffer | 51.52 | 5.36 | 56.88 | x16.5 |
+| No pivot buffer vec 4 | 39.77 | 5.60 | 45.37 | x20.7 |
+| Partial pivot texture | 188.69 | 3.69 | 192.38 | x5.2 |
+| Partial pivot texture vec 4 | 45.86 | 4.27 | 50.13 | x19.9 |
+| Partial pivot buffer | 408.19 | 4.64 | 412.63 | x2.4 |
 | Partial pivot buffer vec 4 | 60.01 | 5.14 | 65.15 | x15.5 |
 
 ---
@@ -54,34 +54,34 @@ The speedup refers to the corrisponding serial implementation.
 
 | (intel) Intel i5-7600 CPU @ 3.50GHz | Gaussian elimination kernel | Solution vector kernel | TOT | Speedup |
 | - | - | - | - | :-: |
-| No pivot texture | 8801.30 | 60.06 | 8861.36 | x0.8 |
-| No pivot texture vec 4 | 2563.40 | 62.65 | 2626.05 | x2.8 |
-| No pivot buffer | 2992.78 | 101.66 | 3094.44 | x2.4 |
-| No pivot buffer vec 4 | 2756.74 | 102.30 | 2859.04 | x2.6 |
-| Partial pivot texture | 138809.60 | 65.60 | 138875.20 | x0.1 |
-| Partial pivot texture vec 4 | 28452.87 | 68.92 | 28521.79 | x0.3 |
-| Partial pivot buffer | 59043.69 | 109.10 | 59152.79 | x0.1 |
-| Partial pivot buffer vec 4 | 12502.44 | 110.52 | 12612.96 | x0.6 |
+| No pivot texture | 8547.25 | 65.61 | 8612.86 | x0.8 |
+| No pivot texture vec 4 | 2435.78 | 65.70 | 2501.48 | x2.9 |
+| No pivot buffer | 3214.02 | 55.78 | 3269.80 | x2.4 |
+| No pivot buffer vec 4 | 2850.55 | 54.05 | 2904.6 | x2.5 |
+| Partial pivot texture | 101066.48 | 57.96 | 101124.45 | x0.1 |
+| Partial pivot texture vec 4 | 25698.44 | 62.28 | 25760.72 | x0.3 |
+| Partial pivot buffer | 61750.63 | 52.37 | 61803.01 | x0.1 |
+| Partial pivot buffer vec 4 | 16033.34 | 52.55 | 16085.89 | x0.5 |
 
 | (pocl) Intel i5-7600 CPU @ 3.50GHz | Gaussian elimination kernel | Solution vector kernel | TOT | Speedup |
 | - | - | - | - | :-: |
-| No pivot texture vec 4 | 8748.75 | 139.74 | 8888.49 | x0.8 |
-| No pivot buffer | 2891.91 | 96.99 | 2988.90 | x2.5 |
-| No pivot buffer vec 4 | 2784.98 | 93.01 | 2877.99 | x2.6 |
+| No pivot texture vec 4 | 8708.75 | 93.74 | 8802.49 | x0.8 |
+| No pivot buffer | 3018.98 | 50.49 | 3069.47 | x2.4 |
+| No pivot buffer vec 4 | 2812.19 | 40.44 | 2852.63 | x2.6 |
 | Partial pivot texture vec 4 | 30451.27 | 137.12 | 30588.39 | x0.3 |
 | Partial pivot buffer | 58998.48 | 100.44 | 59098.92 | x0.1 |
 | Partial pivot buffer vec 4 | 11437.74 | 94.08 | 11531.82 | x0.6 |
 
 | Nvidia GeForce GTX 1060 3GB | Gaussian elimination kernel | Solution vector kernel | TOT | Speedup |
 | - | - | - | - | :-: |
-| No pivot texture | 303.44 | 9.10 | 330.39 | x22.6 |
-| No pivot texture vec 4 | 171.56 | 10.33 | 181.89 | x41.0 |
-| No pivot buffer | 390.51 | 10.54 | 401.05 | x18.6 |
-| No pivot buffer vec 4 | 296.29 | 10.74 | 307.03 | x24.3 |
-| Partial pivot texture | 2421.75 | 8.87 | 2430.62 | x3.1 |
-| Partial pivot texture vec 4 | 365.82 | 9.23 | 355.05 | x21.0 |
-| Partial pivot buffer | 6082.43 | 10.48 | 6092.91 | x1.2 |
-| Partial pivot buffer vec 4 | 702.32 | 10.39 | 712.71 | x10.4 |
+| No pivot texture | 305.39 | 8.18 | 313.57 | x23.8 |
+| No pivot texture vec 4 | 168.77 | 9.08 | 177.85 | x41.9 |
+| No pivot buffer | 374.1 | 10.62 | 384.71 | x19.4 |
+| No pivot buffer vec 4 | 296.99 | 10.62 | 307.61 | x24.2 |
+| Partial pivot texture | 2408.97 | 8.25 | 2417.22 | x3.1 |
+| Partial pivot texture vec 4 | 347.23 | 8.81 | 356.05 | x20.9 |
+| Partial pivot buffer | 6020.84 | 10.26 | 6031.10 | x1.2 |
+| Partial pivot buffer vec 4 | 698.24 | 10.28 | 708.52 | x10.5 |
 
 ---
 
@@ -89,7 +89,7 @@ The speedup refers to the corrisponding serial implementation.
 
 | Category | Implementation | Result |
 | - | - | - |
-| **Greater speedup** | (NVidia) No pivot texture vec 4 | x41.0 |
+| **Greater speedup** | (NVidia) No pivot texture vec 4 | x41.9 |
 | **Smaller positive speedup** | (NVidia) Partial pivot buffer | x1.2 |
 | **Biggest vectorization impact** | (NVidia) Partial pivot buffer vec 4 | x8.6 |
 | **Worst speedup** | (intel) Partial pivot buffer | x0.1 |
