@@ -73,7 +73,7 @@ if (col < cols && row < rows) {
 </td>
 <td>
 
-**Row simplification:**  
+**Row elimination:**  
 in this version, each pixel of the texture contains exactly one value of the matrix, so, even though a float4 is read, only the first value is needed.
 
 Each work-item reads the value at the pivot position, *pivot_val* and the value on the position that will be set to 0, *head_ro_val*.  
@@ -185,6 +185,9 @@ The result is to be stored in local memory, at the position *row* + 1.
 To achieve this in a O(log(n)) time complexity, in each iteration *i* work-items with an assigned index *col* < *i* calculates the sum between the element *col* element and the *i + col* element.  
 The value of *i* is then halved.
 In the case that the number of elements to sum was not even, the last element will be added by the last work-item.
+
+![GPU reduction](svg/GPU-reduction.svg)
+
 </td>
 </tr>
 <tr>
@@ -329,6 +332,8 @@ To achieve this in a O(log(n)) time complexity, in each iteration *i* work-items
 The value of *i* is then halved.
 In the case that the number of elements to check was not even, the last element will be considered by the last work-item.
 
+![GPU reduction](svg/GPU-reduction.svg)
+
 </td>
 </tr>
 <tr>
@@ -365,10 +370,10 @@ if (row == pivot + 1) {
 </td>
 <td>
 
-**Finding the best pivot:**  
+**Row elimination:**  
 in this version, each element of the input buffer contains 4 double.
 
-Each work-item reads the value at the pivot position, *pivot_val* and the value on the position that will be set to 0, *head_ro_val*  
+Each work-item reads the value at the pivot position, *pivot_val* and the value on the position that will be set to 0, *head_row_val*  
 With those two, *mult* can be calculated (mind the minus sign).  
 
 Then, *pivot_row_val*, which is on the *pivot_row* but in the same column as the work-item is multiplied with by the *mult* and the result is added to the current *old_val*, in a vectorized operation.  
