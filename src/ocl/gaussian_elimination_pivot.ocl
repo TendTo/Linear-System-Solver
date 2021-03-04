@@ -77,27 +77,27 @@ kernel void gaussian_elimination_pivot_texture(int pivot, image2d_t read_only in
   int pivot_row = i_lmem[0];
 
   if (col < cols && row < rows) {
-  float head_row_val, old_val;
-  if (row != pivot_row) {
-    head_row_val = read_imagef(in_U, s, (int2)(pivot, row)).s0;
-    old_val = read_imagef(in_U, s, (int2)(col, row)).s0;
-  } else {
-    head_row_val = read_imagef(in_U, s, (int2)(pivot, pivot)).s0;
-    old_val = read_imagef(in_U, s, (int2)(col, pivot)).s0;
-  }
-  float pivot_val = read_imagef(in_U, s, (int2)(pivot, pivot_row)).s0;
-  float pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot_row)).s0;
-  float mult = -head_row_val / pivot_val;
-  float new_val = old_val + pivot_row_val * mult;
-  write_imagef(out_U, (int2)(col, row), (float4)(new_val, 0.0f, 0.0f, 1.0f));
+    float head_row_val, old_val;
+    if (row != pivot_row) {
+      head_row_val = read_imagef(in_U, s, (int2)(pivot, row)).s0;
+      old_val = read_imagef(in_U, s, (int2)(col, row)).s0;
+    } else {
+      head_row_val = read_imagef(in_U, s, (int2)(pivot, pivot)).s0;
+      old_val = read_imagef(in_U, s, (int2)(col, pivot)).s0;
+    }
+    float pivot_val = read_imagef(in_U, s, (int2)(pivot, pivot_row)).s0;
+    float pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot_row)).s0;
+    float mult = -head_row_val / pivot_val;
+    float new_val = old_val + pivot_row_val * mult;
+    write_imagef(out_U, (int2)(col, row), (float4)(new_val, 0.0f, 0.0f, 1.0f));
 
-  // Copy the pivot row on the output
-  if (row == pivot + 1) {
-    write_imagef(out_U, (int2)(col, pivot), (float4)(pivot_row_val, 0.0f, 0.0f, 1.0f));
-    if (col == pivot + 1)
-      write_imagef(out_U, (int2)(pivot, pivot), (float4)(pivot_val, 0.0f, 0.0f, 1.0f));
+    // Copy the pivot row on the output
+    if (row == pivot + 1) {
+      write_imagef(out_U, (int2)(col, pivot), (float4)(pivot_row_val, 0.0f, 0.0f, 1.0f));
+      if (col == pivot + 1)
+        write_imagef(out_U, (int2)(pivot, pivot), (float4)(pivot_val, 0.0f, 0.0f, 1.0f));
+    }
   }
-}
 }
 
 kernel void gaussian_elimination_solve_texture(image2d_t read_only even_U, image2d_t read_only odd_U,
@@ -109,65 +109,49 @@ kernel void gaussian_elimination_solve_texture(image2d_t read_only even_U, image
   const int n_li = get_local_size(0);
   const int rows_li = ((rows + n_li - 1) / n_li) * n_li;
 
+  // Fill the local memory with the known values
+  for (int row = li; row < rows_li; row += n_li) {
+    if (row < rows)
+      if (row != rows - 1)
+        lmem[row] = (row & 1) ? read_imagef(odd_U, s, (int2)(cols - 1, row)).s0
+                              : read_imagef(even_U, s, (int2)(cols - 1, row)).s0;
+      else
+        lmem[row] = (row & 1) ? read_imagef(even_U, s, (int2)(cols - 1, row)).s0
+                              : read_imagef(odd_U, s, (int2)(cols - 1, row)).s0;
+  }
+  barrier(CLK_LOCAL_MEM_FENCE);
+
   for (int row = rows - 1; row >= 0; --row) {
-
-    // Fill the local memory
-    for (int col = li; col < rows_li; col += n_li) {
-      if (col > row && col < rows) {
-        float coefficient;
-        if (row != rows - 1)
-          coefficient = (row & 1) ? read_imagef(odd_U, s, (int2)(col, row)).s0 
-                                  : read_imagef(even_U, s, (int2)(col, row)).s0;
-        else
-          coefficient =
-              (row & 1) ? read_imagef(even_U, s, (int2)(col, row)).s0 : read_imagef(odd_U, s, (int2)(col, row)).s0;
-        lmem[col] = lmem[rows + col] * coefficient;
-      }
-    }
-    barrier(CLK_LOCAL_MEM_FENCE);
-
-    // Sum all the values obtained from the previously calculated unknowns
-    int cols_remaining = rows - 1 - row;
-    int is_odd = cols_remaining & 1;
-    for (int i = cols_remaining >> 1; i > 0; i = i >> 1) {
-      for (int col = li; col < rows_li; col += n_li) {
-        if (col < i) {
-          int temp_col = row + 1 + col;
-          lmem[temp_col] += lmem[temp_col + i];
-          if (col == i - 1 && is_odd)
-            lmem[temp_col] += lmem[temp_col + i + 1];
-        }
-      }
-      barrier(CLK_LOCAL_MEM_FENCE);
-      is_odd = i & 1;
-    }
+    // Result value of the unknown of the current row
+    float result;
 
     // The wi-row calculates the sum and writes the result
     for (int col = li; col < rows_li; col += n_li) {
-      if (col == row) {
-        float coefficient;
-        float sum;
-        if (row != rows - 1) {
-          coefficient =
-              (row & 1) ? read_imagef(odd_U, s, (int2)(col, row)).s0 : read_imagef(even_U, s, (int2)(col, row)).s0;
-          sum = (row & 1) ? read_imagef(odd_U, s, (int2)(cols - 1, row)).s0
-                          : read_imagef(even_U, s, (int2)(cols - 1, row)).s0;
-        } else {
-          coefficient =
-              (row & 1) ? read_imagef(even_U, s, (int2)(col, row)).s0 : read_imagef(odd_U, s, (int2)(col, row)).s0;
-          sum = (row & 1) ? read_imagef(even_U, s, (int2)(cols - 1, row)).s0
-                          : read_imagef(odd_U, s, (int2)(cols - 1, row)).s0;
-        }
-        if (row != rows - 1)
-          sum -= lmem[row + 1];
-        lmem[rows + col] = sum / coefficient;
+      float coefficient;
+      float sum = lmem[row];
+      if (row != rows - 1) {
+        coefficient =
+            (row & 1) ? read_imagef(odd_U, s, (int2)(row, row)).s0 : read_imagef(even_U, s, (int2)(row, row)).s0;
+      } else {
+        coefficient =
+            (row & 1) ? read_imagef(even_U, s, (int2)(row, row)).s0 : read_imagef(odd_U, s, (int2)(row, row)).s0;
+      }
+      result = sum / coefficient;
+      // Write the result on the output mem-obj
+      if (col == row)
+        x[row] = result;
+    }
+
+    // Update al the known values in local memory
+    for (int row_update = li; row_update < rows_li; row_update += n_li) {
+      if (row_update < row) {
+        float coefficient = (row_update & 1) ? read_imagef(odd_U, s, (int2)(row, row_update)).s0
+                                             : read_imagef(even_U, s, (int2)(row, row_update)).s0;
+        lmem[row_update] -= result * coefficient;
       }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
   }
-  for (int row = li; row < rows_li; row += n_li)
-    if (row < rows)
-      x[row] = lmem[rows + row];
 }
 
 kernel void gaussian_elimination_pivot_texture_vec(int pivot, image2d_t read_only in_U, image2d_t write_only out_U,
@@ -232,47 +216,47 @@ kernel void gaussian_elimination_pivot_texture_vec(int pivot, image2d_t read_onl
   int pivot_row = i_lmem[0];
 
   if (col < cols && row < rows) {
-  float4 old_val, head_row_val4;
-  float4 pivot_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, pivot_row));
-  if (row != pivot_row) {
-    head_row_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, row));
-    old_val = read_imagef(in_U, s, (int2)(col, row));
-  } else {
-    head_row_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, pivot));
-    old_val = read_imagef(in_U, s, (int2)(col, pivot));
-  }
-  float pivot_val, head_row_val;
-  switch (pivot & 3) {
-  case 0:
-    pivot_val = pivot_val4.s0;
-    head_row_val = head_row_val4.s0;
-    break;
-  case 1:
-    pivot_val = pivot_val4.s1;
-    head_row_val = head_row_val4.s1;
-    break;
-  case 2:
-    pivot_val = pivot_val4.s2;
-    head_row_val = head_row_val4.s2;
-    break;
-  case 3:
-    pivot_val = pivot_val4.s3;
-    head_row_val = head_row_val4.s3;
-    break;
-  }
-  float mult = -head_row_val / pivot_val;
+    float4 old_val, head_row_val4;
+    float4 pivot_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, pivot_row));
+    if (row != pivot_row) {
+      head_row_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, row));
+      old_val = read_imagef(in_U, s, (int2)(col, row));
+    } else {
+      head_row_val4 = read_imagef(in_U, s, (int2)(pivot_quarts, pivot));
+      old_val = read_imagef(in_U, s, (int2)(col, pivot));
+    }
+    float pivot_val, head_row_val;
+    switch (pivot & 3) {
+    case 0:
+      pivot_val = pivot_val4.s0;
+      head_row_val = head_row_val4.s0;
+      break;
+    case 1:
+      pivot_val = pivot_val4.s1;
+      head_row_val = head_row_val4.s1;
+      break;
+    case 2:
+      pivot_val = pivot_val4.s2;
+      head_row_val = head_row_val4.s2;
+      break;
+    case 3:
+      pivot_val = pivot_val4.s3;
+      head_row_val = head_row_val4.s3;
+      break;
+    }
+    float mult = -head_row_val / pivot_val;
 
-  float4 pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot_row));
-  float4 new_val = old_val + pivot_row_val * (float4)(mult);
-  write_imagef(out_U, (int2)(col, row), new_val);
+    float4 pivot_row_val = read_imagef(in_U, s, (int2)(col, pivot_row));
+    float4 new_val = old_val + pivot_row_val * (float4)(mult);
+    write_imagef(out_U, (int2)(col, row), new_val);
 
-  // Copy the pivot row on the output
-  if (row == pivot + 1) {
-    write_imagef(out_U, (int2)(col, pivot), pivot_row_val);
-    if (col == pivot + 1)
-      write_imagef(out_U, (int2)(pivot_quarts, pivot), pivot_val4);
+    // Copy the pivot row on the output
+    if (row == pivot + 1) {
+      write_imagef(out_U, (int2)(col, pivot), pivot_row_val);
+      if (col == pivot + 1)
+        write_imagef(out_U, (int2)(pivot_quarts, pivot), pivot_val4);
+    }
   }
-}
 }
 
 kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, image2d_t read_only odd_U,
@@ -284,73 +268,61 @@ kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, i
   const int n_li = get_local_size(0);
   const int rows_li = ((rows + n_li - 1) / n_li) * n_li;
 
+  // Fill the local memory with the known values
+  for (int row = li; row < rows_li; row += n_li) {
+    if (row < rows)
+      if (row != rows - 1)
+        lmem[row] = (row & 1) ? read_imagef(odd_U, s, (int2)(cols - 1, row)).s3
+                              : read_imagef(even_U, s, (int2)(cols - 1, row)).s3;
+      else
+        lmem[row] = (row & 1) ? read_imagef(even_U, s, (int2)(cols - 1, row)).s3
+                              : read_imagef(odd_U, s, (int2)(cols - 1, row)).s3;
+  }
+  barrier(CLK_LOCAL_MEM_FENCE);
+
   for (int row = rows - 1; row >= 0; --row) {
-
-    // Fill the local memory
-    for (int col = li; col < rows_li; col += n_li) {
-      if (col > row && col < rows) {
-        const int col_quarts = col / 4;
-        float4 coefficient4;
-        float coefficient;
-        if (row != rows - 1)
-          coefficient4 = (row & 1) ? read_imagef(odd_U, s, (int2)(col_quarts, row))
-                                   : read_imagef(even_U, s, (int2)(col_quarts, row));
-        else
-          coefficient4 = (row & 1) ? read_imagef(even_U, s, (int2)(col_quarts, row))
-                                   : read_imagef(odd_U, s, (int2)(col_quarts, row));
-        switch (col & 3) {
-        case 0:
-          coefficient = coefficient4.s0;
-          break;
-        case 1:
-          coefficient = coefficient4.s1;
-          break;
-        case 2:
-          coefficient = coefficient4.s2;
-          break;
-        case 3:
-          coefficient = coefficient4.s3;
-          break;
-        }
-        lmem[col] = lmem[rows + col] * coefficient;
-      }
-    }
-    barrier(CLK_LOCAL_MEM_FENCE);
-
-    // Sum all the values obtained from the previously calculated unknowns
-    int cols_remaining = rows - 1 - row;
-    int is_odd = cols_remaining & 1;
-    for (int i = cols_remaining >> 1; i > 0; i = i >> 1) {
-      for (int col = li; col < rows_li; col += n_li) {
-        if (col < i) {
-          int temp_col = row + 1 + col;
-          lmem[temp_col] += lmem[temp_col + i];
-          if (col == i - 1 && is_odd)
-            lmem[temp_col] += lmem[temp_col + i + 1];
-        }
-      }
-      barrier(CLK_LOCAL_MEM_FENCE);
-      is_odd = i & 1;
-    }
+    const int row_quarts = row / 4;
+    float result;
 
     // The wi-row calculates the sum and writes the result
     for (int col = li; col < rows_li; col += n_li) {
-      if (col == row) {
-        const int col_quarts = col / 4;
-        float4 coefficient4;
-        float coefficient, sum;
-        if (row != rows - 1) {
-          coefficient4 = (row & 1) ? read_imagef(odd_U, s, (int2)(col_quarts, row))
-                                   : read_imagef(even_U, s, (int2)(col_quarts, row));
-          sum = (row & 1) ? read_imagef(odd_U, s, (int2)(cols - 1, row)).s3
-                          : read_imagef(even_U, s, (int2)(cols - 1, row)).s3;
-        } else {
-          coefficient4 = (row & 1) ? read_imagef(even_U, s, (int2)(col_quarts, row))
-                                   : read_imagef(odd_U, s, (int2)(col_quarts, row));
-          sum = (row & 1) ? read_imagef(even_U, s, (int2)(cols - 1, row)).s3
-                          : read_imagef(odd_U, s, (int2)(cols - 1, row)).s3;
-        }
-        switch (col & 3) {
+      const int col_quarts = col / 4;
+      float4 coefficient4;
+      float coefficient;
+      float sum = lmem[row];
+      if (row != rows - 1) {
+        coefficient4 = (row & 1) ? read_imagef(odd_U, s, (int2)(row_quarts, row))
+                                 : read_imagef(even_U, s, (int2)(row_quarts, row));
+      } else {
+        coefficient4 = (row & 1) ? read_imagef(even_U, s, (int2)(row_quarts, row))
+                                 : read_imagef(odd_U, s, (int2)(row_quarts, row));
+      }
+      switch (row & 3) {
+      case 0:
+        coefficient = coefficient4.s0;
+        break;
+      case 1:
+        coefficient = coefficient4.s1;
+        break;
+      case 2:
+        coefficient = coefficient4.s2;
+        break;
+      case 3:
+        coefficient = coefficient4.s3;
+        break;
+      }
+      result = sum / coefficient;
+      if (col == row)
+        x[row] = result;
+    }
+
+    // Update al the known values in local memory
+    for (int row_update = li; row_update < rows_li; row_update += n_li) {
+      if (row_update < row) {
+        float4 coefficient4 = (row_update & 1) ? read_imagef(odd_U, s, (int2)(row_quarts, row_update))
+                                               : read_imagef(even_U, s, (int2)(row_quarts, row_update));
+        float coefficient;
+        switch (row & 3) {
         case 0:
           coefficient = coefficient4.s0;
           break;
@@ -364,16 +336,11 @@ kernel void gaussian_elimination_solve_texture_vec(image2d_t read_only even_U, i
           coefficient = coefficient4.s3;
           break;
         }
-        if (row != rows - 1)
-          sum -= lmem[row + 1];
-        lmem[rows + col] = sum / coefficient;
+        lmem[row_update] -= result * coefficient;
       }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
   }
-  for (int row = li; row < rows_li; row += n_li)
-    if (row < rows)
-      x[row] = lmem[rows + row];
 }
 
 kernel void gaussian_elimination_pivot_buffer(int rows, int cols, int pivot, global const double *restrict in_U,
@@ -447,9 +414,9 @@ kernel void gaussian_elimination_pivot_buffer(int rows, int cols, int pivot, glo
   }
 }
 
-kernel void gaussian_elimination_pivot_buffer_vec(int rows, int cols_quarts, int pivot, global const double4 *restrict in_U,
-                                                  global double4 *restrict out_U, local double *restrict lmem,
-                                                  local uint *restrict i_lmem) {
+kernel void gaussian_elimination_pivot_buffer_vec(int rows, int cols_quarts, int pivot,
+                                                  global const double4 *restrict in_U, global double4 *restrict out_U,
+                                                  local double *restrict lmem, local uint *restrict i_lmem) {
   global const double *s_in_U = in_U;
   global double *s_out_U = out_U;
 
@@ -534,51 +501,40 @@ kernel void gaussian_elimination_solve_buffer(int rows, int cols, global const d
   const int n_li = get_local_size(0);
   const int rows_li = ((rows + n_li - 1) / n_li) * n_li;
 
+  // Fill the local memory with the known values
+  for (int row = li; row < rows_li; row += n_li) {
+    if (row < rows)
+      if (row != rows - 1)
+        lmem[row] = (row & 1) ? odd_U[row * cols + cols - 1] : even_U[row * cols + cols - 1];
+      else
+        lmem[row] = (row & 1) ? even_U[row * cols + cols - 1] : odd_U[row * cols + cols - 1];
+  }
+  barrier(CLK_LOCAL_MEM_FENCE);
+
   for (int row = rows - 1; row >= 0; --row) {
-    if (row != rows - 1)
-      in_U = (row & 1) ? odd_U : even_U;
-    else
-      in_U = (row & 1) ? even_U : odd_U;
-
-    // Fill the local memory
-    for (int col = li; col < rows_li; col += n_li) {
-      if (col > row && col < rows) {
-        double coefficient = in_U[row * cols + col];
-        lmem[col] = lmem[rows + col] * coefficient;
-      }
-    }
-    barrier(CLK_LOCAL_MEM_FENCE);
-
-    // Sum all the values obtained from the previously calculated unknowns
-    int cols_remaining = rows - 1 - row;
-    int is_odd = cols_remaining & 1;
-    for (int i = cols_remaining >> 1; i > 0; i = i >> 1) {
-      for (int col = li; col < rows_li; col += n_li) {
-        if (col < i) {
-          int temp_col = row + 1 + col;
-          lmem[temp_col] += lmem[temp_col + i];
-          if (col == i - 1 && is_odd)
-            lmem[temp_col] += lmem[temp_col + i + 1];
-        }
-      }
-      barrier(CLK_LOCAL_MEM_FENCE);
-      is_odd = i & 1;
-    }
+    double result;
 
     // The wi-row calculates the sum and writes the result
     for (int col = li; col < rows_li; col += n_li) {
-      if (col == row) {
-        double coefficient = in_U[row * cols + col];
-        double sum = in_U[row * cols + rows];
-        if (row != rows - 1)
-          sum -= lmem[row + 1];
-        lmem[rows + col] = sum / coefficient;
-        const int group_id = get_group_id(0);
+      double coefficient;
+      if (row != rows - 1)
+        coefficient = (row & 1) ? odd_U[row * cols + row] : even_U[row * cols + row];
+      else
+        coefficient = (row & 1) ? even_U[row * cols + row] : odd_U[row * cols + row];
+      double sum = lmem[row];
+      result = sum / coefficient;
+      // Write the result on the output mem-obj
+      if (col == row)
+        x[row] = result;
+    }
+
+    // Update al the known values in local memory
+    for (int row_update = li; row_update < rows_li; row_update += n_li) {
+      if (row_update < row) {
+        float coefficient = (row_update & 1) ? odd_U[row_update * cols + row] : even_U[row_update * cols + row];
+        lmem[row_update] -= result * coefficient;
       }
     }
     barrier(CLK_LOCAL_MEM_FENCE);
   }
-  for (int row = li; row < rows_li; row += n_li)
-    if (row < rows)
-      x[row] = lmem[rows + row];
 }
